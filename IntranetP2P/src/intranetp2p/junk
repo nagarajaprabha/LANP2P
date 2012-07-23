@@ -1,0 +1,34 @@
+/* public void getPartOfFile(String fileName, int offSet, int length) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	public void getPartOfFile(File file, InputStream is) {
+		// TODO Auto-generated method stub
+		
+	}
+*/	
+  public OutputStream getPartOfFile(InputStream is , int offset , int length){
+	  return null;
+  }
+/**
+ * Called by proxyserver
+ * API Returns the boolean after searching the fileName in local cache
+ * @param fileName
+ * @param url
+ * @return
+ */
+	public boolean SearchFile(String fileName , String url){
+		return false;
+	}
+	public OutputStream getFile(String fileName) {
+		/**
+		 * 1. Search a file
+		 * 2. Return the Stream
+		 */
+		return null;
+		// TODO Auto-generated method stub
+		
+	}
+
+  
