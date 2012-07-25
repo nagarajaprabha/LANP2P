@@ -24,7 +24,7 @@ public class P2PCommunicationMediator {
 	 * returns the outputstream
 	 * Mediator listens to Peers Request
 	 */
-	public void listenPeerRequest(){
+	public void listenPeersRequest(){
 		try {
 			CacheMgr mgr = new CacheMgr();
 			DatagramSocket responseDatagram =  new DatagramSocket(5000);
