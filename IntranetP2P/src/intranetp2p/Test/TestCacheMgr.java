@@ -21,7 +21,7 @@ public class TestCacheMgr extends TestCase {
 	}
 	public void testSaveFile(){
 		String fileName = "test";
-		Byte[] b = new Byte[1];
+		byte[] b = new byte[1];
 		b[0]='l';
 		mgr.saveFile(b , fileName);
 		String path = FileSystemView.getFileSystemView().getDefaultDirectory().getPath()+File.pathSeparator+"LANP2P";

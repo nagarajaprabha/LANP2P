@@ -96,7 +96,7 @@ public class CacheMgr {
 	 * TODO refactor b to String
 	 * @param bytes
 	 */
-	public void saveFile(Byte []b,String fileName){
+	public void saveFile(byte []b,String fileName){
 		DataOutputStream dos = null;
 		String path = FileSystemView.getFileSystemView().getDefaultDirectory().getPath()+File.separator+CACHE_PATH_NAME;
 		File dir = new File(path);

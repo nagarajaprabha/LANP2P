@@ -62,33 +62,6 @@ public class Server {
 
 	public Socket getClientSocket() {
 		// TODO Auto-generated method stub
-		try {
-			InputStream in = client.getInputStream();
-			OutputStream out = client.getOutputStream();
-			BufferedReader br = new BufferedReader(new InputStreamReader(in));
-			boolean flag = false;
-			if(br!=null){
-				flag = cacheMgr.isFileAvailable(br.readLine());
-				if(flag){
-					out.write("Available".getBytes());
-				}else{
-					out.write("NA".getBytes());
-				}
-				
-			}
-				
-				
-			byte[] b = new byte[1000];
-			while(in.read(b )!=-1){
-				System.out.println(b);
-				out.write(new String(" Client Connection").getBytes());
-			 out.write(b);	
-			 
-			}
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			new RuntimeException(e);
-		}
 		return client;
 	}
 

@@ -17,17 +17,12 @@ import sun.management.FileSystem;
 import sun.security.x509.AVA;
 
 public class P2PHandler {
+	
 	private static final String IS_FILE_AVAILABLE ="isFileAvailable";
+	
 	CacheMgr mgr ;
 	Socket clientSocket ;
-/*	*//**
-	 * Mediator opens the connection for communication with other peers
-	 *//*
-	public void openPeerConnections(){
-		
-	}
-	
-*/	
+
 	public P2PHandler(){
 		mgr = new CacheMgr();
 		//Started the LocalServer
@@ -44,7 +39,7 @@ public class P2PHandler {
 	 * searches the file
 	 * returns the outputstream
 	 * Mediator listens to Peers Request
-	 * TODO : Thread Implementation Required
+	 * TODO : Thread Implementation may be Required
 	 */
 	public void listenPeersRequest(){
 
@@ -53,25 +48,41 @@ public class P2PHandler {
 			OutputStream out = clientSocket.getOutputStream();
 			BufferedReader br = new BufferedReader(new InputStreamReader(in));
 			boolean flag = false;
-			while(br.read()!=-1){
-				if(br.readLine().contains("isFileAvailable")){
-					flag = mgr.isFileAvailable(br.readLine());
-					if(flag){
-						out.write("Available".getBytes());
-					}else{
-						out.write("NA".getBytes());
+			while(true){
+				
+					/**
+					 * FirstLine : isFileAvailable
+					 * SecondLine : FileName
+					 */
+					if(br.readLine().contains("isFileAvailable")){
+						flag = mgr.isFileAvailable(br.readLine());
+						if(flag){
+							out.write("Available".getBytes());
+							
+						}else{
+							out.write("NA".getBytes());
+							
+						}
+						
+
+					}else if(br.readLine().contains("getFile")){
+						//FileName is after getFile String
+						/**
+						 * FirstList : getFile+"FileName"
+						 */
+						out.write(mgr.getFileByName(br.readLine().substring("getFile".length())));
+						
+					}else if(br.readLine().contains("partFile")){
+						//processing the response
+						/**
+						 * First Line : getFile+"FileName"
+						 * Second Line : int offset
+						 * Third Line :  int length
+						 */
+						out.write(mgr.getFile(br.readLine().substring("getFile".length()), Integer.parseInt(br.readLine()), Integer.parseInt(br.readLine())));
+						
 					}
-					
-
-				}else if(br.readLine().contains("getFile")){
-					//FileName is after getFile String
-					out.write(mgr.getFileByName(br.readLine().substring("getFile".length())));
-				}else if(br.readLine().contains("partFile")){
-					//processing the response
-					out.write(mgr.getFile(br.readLine().substring("getFile".length()), Integer.parseInt(br.readLine()), Integer.parseInt(br.readLine())));
 				}
-			}
-
 		
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -80,32 +91,13 @@ public class P2PHandler {
 
 	}
 	
-	/**
-	 * Sends the Response to the Peers
-	 */
-	public Byte sendResponseToPeers(OutputStream os){
-		try {
-			DatagramSocket dgs = new DatagramSocket(5000);
-			//InetAddress address = InetAddress.getByName("jenkov.com");
-			DatagramSocket c = new DatagramSocket();
-			String fileName = null;
-			//TODO ERROR 
-			DatagramPacket packet = new DatagramPacket(fileName.getBytes(), 0,null, 5000);
-			c.send(packet);
-			//c.receive(packet);
-			//(4)
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return null;
-	}
 
-	
 	/** Based on the request from proxy ,  notifies all peers to search for a given fileName
 	 * ApplicationServer sends the Notification for all peers,to search for a file with the given FileName
 	 * 
 	 * MY LOCAL IS ACTING AS A CLIENT
+	 * 
+	 * TODO : Can we rename this method as getFileFromPeers
 	 */
 	public void notifyAllPeers(String fileName) throws UnknownHostException{
 		Socket []clntSocket = null;
@@ -118,23 +110,42 @@ public class P2PHandler {
 			byte []infoBytes = mgr.searchAndGetFile("peerList");
 			ByteArrayInputStream bis = new ByteArrayInputStream(infoBytes);
 			BufferedReader br = new BufferedReader(new InputStreamReader(bis));
+			BufferedWriter bw = null;
 			String ipAddress = null;
 			InetAddress ip = null;
+			
 			SocketAddress sd = null;
 			PrintWriter w = null;
 			int i = 0;
+			
+			InputStream is = null;
+			OutputStream os = null;
+			/**
+			 * Sending Request PART
+			 */
 			while((ipAddress=br.readLine())!=null){
 
 				clntSocket[i] = new Socket(ipAddress,5000);
+				/**
+				 * Format :
+				 * 
+				 *FirstLine : isFileAvailable
+				 *SecondLine : FileName
+				 */
 				clntSocket[i].getOutputStream().write(("isFileAvailable\n"+fileName).getBytes());
 				i++;
 
 			}
-			// Got the list of PEERS who has the Required FileName
+			/**
+			 * Receving RESPONSE PART
+			 */
+			Thread.sleep(5000);
+
+			// Get the list of PEERS who has the Required FileName
 			Socket []availablePeers = null;
 			int countOfAvailable = 0;
 			for(Socket peer : clntSocket){
-				InputStream is = peer.getInputStream();
+				is = peer.getInputStream();
 				br = new BufferedReader(new InputStreamReader(is));
 								
 					if(br.readLine().trim().equals("Available")){
@@ -147,7 +158,9 @@ public class P2PHandler {
 			
 			//getting the count of AVAILABLE SERVER PEERS
 			if(countOfAvailable>1){
+				
 				for(Socket peer : availablePeers){
+					
 					//TODO logic of getting the bytes from each
 					/**
 					 * 1. Get the size of the file
@@ -156,8 +169,13 @@ public class P2PHandler {
 					 * Assuming each peer has COMPLETE FILE
 					 * FOR SAMPLE , GET THE FILE SIZE FROM THE FIRST PEER
 					 */
-					InputStream is = peer.getInputStream();
+					is = peer.getInputStream();
+					os = peer.getOutputStream();
+					
 					br = new BufferedReader(new InputStreamReader(is));
+					bw = new BufferedWriter(new OutputStreamWriter(os));
+					
+					bw.write("get"+fileName);
 					
 					/**
 					 * construct a packet
@@ -165,16 +183,42 @@ public class P2PHandler {
 					 *  2. FILENAME
 					 *  
 					 */
-					
+				
 				}
 			}else if (countOfAvailable==1){
-
+				
+				try{
+				
+				is = availablePeers[0].getInputStream();
+				os = availablePeers[0].getOutputStream();
+				
+				br = new BufferedReader(new InputStreamReader(is));
+				bw = new BufferedWriter(new OutputStreamWriter(os));
+				
+				bw.write("get"+fileName);
+				
+				//wait for the response
+				Thread.sleep(5000);
+				
+				boolean flag = false;
+				while(true){
+					while(br.readLine()!=null){
+						mgr.saveFile(br.readLine().getBytes(), fileName);
+						flag = true;
+					}
+					if(flag){
+						break;
+					}
+				}
+			 }catch(Exception e){
+				throw new RuntimeException(e) ;
+			 } finally{
+				 is.close();
+				 os.close();
+			 }
 			}else
 			{
 				// NO SERVER PEER HAS THE FILE
-			}
-			for(Socket sock: clntSocket){
-				
 			}
 			
 		} catch (Exception e) {
