@@ -86,13 +86,14 @@ public class CacheMgr {
 	/**
 	 * @param dir
 	 */
-	private void createDirectoryIfNecessary(File dir) {
+	public void createDirectoryIfNecessary(File dir) {
 		if(!dir.exists()){
 			dir.mkdir();
 		}
 	}
 	/**
 	 * Called by the ProxyServer by supplying the bytes
+	 * TODO refactor b to String
 	 * @param bytes
 	 */
 	public void saveFile(Byte []b,String fileName){
@@ -132,6 +133,7 @@ public class CacheMgr {
 	 * @param fileName
 	 * @param offSet
 	 * @param length
+	 * TODO refactor this to Byte Streams
 	 * @return
 	 */
 	public byte[] getFile(String fileName,int off , int len){
@@ -175,9 +177,32 @@ public class CacheMgr {
 		return null;
 		
 	}
-	public boolean isFileAvailable() {
+
+	public boolean isFileAvailable(String fileName) {
 		// TODO Auto-generated method stub
-		return false;
+		//OutputStream os = getFile(fileName);
+		//File dir = new File(CACHE_PATH_NAME);
+		String path = FileSystemView.getFileSystemView().getDefaultDirectory().getPath()+File.separator+CACHE_PATH_NAME;
+		File dir = new File(path);
+		//ArrayList <Byte> b = new ArrayList<Byte>();
+		
+		DataInputStream dis;
+		System.out.println("Path Info "+path);
+		System.out.println("Directory Info "+dir + " IsDirectory "+dir.isDirectory() +" Directory Exists? "+ dir.exists());
+		createDirectoryIfNecessary(dir);
+		boolean flag = false;
+		for(File search : dir.listFiles()){
+			System.out.println(" Required File is "+ removeExtension(search.getName()) + " Required Search FileName is "+fileName);
+			if(removeExtension(search.getName()).equals(fileName)){
+				flag = true;
+				break;
+			}
+		      else{
+		    	  flag = false;
+				break;
+		      }
+		}
+		return flag;	
 		
 	}
 	public byte[] getFileByName(String string) {
