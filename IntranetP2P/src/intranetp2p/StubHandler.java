@@ -3,19 +3,25 @@
  */
 package intranetp2p;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
-
+import intranetp2p.*;
 /**
  * @author nprabha
  *
  */
-public class P2PluginCommunicationMediator {
+public class StubHandler {
 
-		/**Plugin requests for the file 
+		/**OutPUT STREAM We Write , InputStream : Read
+		 * Port Number 6000 : Proxy to this process COmmunication
+		 * Plugin requests for the file 
 		 * P2PPluginCommunicator asks the CacheMgr to search for a given filename in the localcache
 		 * if the file is available in the local cache then that file content is returned in the form of bytes
 		 * else 
@@ -25,15 +31,17 @@ public class P2PluginCommunicationMediator {
 		public void listenPluginRequest(){
 			try {
 				Socket s = new Socket("localmachine",6000);
+//				BufferedReader br = new BufferedReader(new InputStreamReader(s.getInputStream()));
+//				BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(s.getOutputStream()));
 				DataInputStream dis = (DataInputStream) s.getInputStream();
 				DataOutputStream dos = (DataOutputStream) s.getOutputStream();
 				byte[] b = null;//variable is 'b' contains fileName
 				String fileName = new String();
 				CacheMgr mgr = new CacheMgr();
-				P2PCommunicationMediator p2pComm = new P2PCommunicationMediator();
+				P2PHandler p2pComm = new P2PHandler();
 				while(true){
 				  fileName = dis.readLine();
-					if(mgr.isFileAvailable()){
+					if(mgr.isFileAvailable(fileName)){
 						//if the file is available in the local cache then search and return the file contents
 						dos.write(mgr.getFileByName(fileName));
 						
