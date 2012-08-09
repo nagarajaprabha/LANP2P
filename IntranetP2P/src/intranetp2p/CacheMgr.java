@@ -21,8 +21,8 @@ public class CacheMgr {
 	
 	public CacheMgr(){
 		try {
-			Class.forName("DriverClass");
-			con = DriverManager.getConnection("url");
+			Class.forName("SQLite.JDBCDriver");
+			con = DriverManager.getConnection("jdbc:sqlite:/LANP2P");
 						
 		} catch (ClassNotFoundException e) {
 			// TODO Auto-generated catch block
