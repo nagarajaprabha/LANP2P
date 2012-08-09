@@ -10,6 +10,7 @@ import java.net.Socket;
 import java.net.SocketAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.StringTokenizer;
 
 import javax.swing.filechooser.FileSystemView;
 
@@ -48,6 +49,7 @@ public class P2PHandler {
 			OutputStream out = clientSocket.getOutputStream();
 			BufferedReader br = new BufferedReader(new InputStreamReader(in));
 			boolean flag = false;
+			String response = new String();
 			while(true){
 				
 					/**
@@ -55,9 +57,12 @@ public class P2PHandler {
 					 * SecondLine : FileName
 					 */
 					if(br.readLine().contains("isFileAvailable")){
-						flag = mgr.isFileAvailable(br.readLine());
-						if(flag){
-							out.write("Available".getBytes());
+						response = mgr.isFileURLAvailable(br.readLine());
+						
+						//TODO can make it into a single condition
+						if(response!=null){
+							StringTokenizer st = new StringTokenizer(response);
+							out.write(("Available \n"+st.nextToken()+"\n"+st.nextToken()+"\n"+st.nextToken()+"\n"+st.nextToken()).getBytes());
 							
 						}else{
 							out.write("NA".getBytes());
@@ -99,7 +104,7 @@ public class P2PHandler {
 	 * 
 	 * TODO : Can we rename this method as getFileFromPeers
 	 */
-	public void notifyAllPeers(String fileName) throws UnknownHostException{
+	public void notifyAllPeers(String fileurl) throws UnknownHostException{
 		Socket []clntSocket = null;
 		try {
 			
@@ -108,8 +113,10 @@ public class P2PHandler {
 			
 			
 			byte []infoBytes = mgr.searchAndGetFile("peerList");
+		
 			ByteArrayInputStream bis = new ByteArrayInputStream(infoBytes);
 			BufferedReader br = new BufferedReader(new InputStreamReader(bis));
+			
 			BufferedWriter bw = null;
 			String ipAddress = null;
 			InetAddress ip = null;
@@ -120,6 +127,8 @@ public class P2PHandler {
 			
 			InputStream is = null;
 			OutputStream os = null;
+			
+			
 			/**
 			 * Sending Request PART
 			 */
@@ -132,7 +141,7 @@ public class P2PHandler {
 				 *FirstLine : isFileAvailable
 				 *SecondLine : FileName
 				 */
-				clntSocket[i].getOutputStream().write(("isFileAvailable\n"+fileName).getBytes());
+				clntSocket[i].getOutputStream().write(("isFileURLAvailable\n"+fileurl).getBytes());
 				i++;
 
 			}
@@ -149,8 +158,9 @@ public class P2PHandler {
 				br = new BufferedReader(new InputStreamReader(is));
 								
 					if(br.readLine().trim().equals("Available")){
-						countOfAvailable++;
+						
 						availablePeers[countOfAvailable] = peer;
+						countOfAvailable++;
 					}
 				
 				
@@ -175,7 +185,9 @@ public class P2PHandler {
 					br = new BufferedReader(new InputStreamReader(is));
 					bw = new BufferedWriter(new OutputStreamWriter(os));
 					
-					bw.write("get"+fileName);
+					int size = 0 , offset=0 , length=0;
+					
+					bw.write("get"+fileurl+"\n"+offset+"\n"+"length");
 					
 					/**
 					 * construct a packet
@@ -195,7 +207,7 @@ public class P2PHandler {
 				br = new BufferedReader(new InputStreamReader(is));
 				bw = new BufferedWriter(new OutputStreamWriter(os));
 				
-				bw.write("get"+fileName);
+				bw.write("get"+fileurl);
 				
 				//wait for the response
 				Thread.sleep(5000);
@@ -203,7 +215,7 @@ public class P2PHandler {
 				boolean flag = false;
 				while(true){
 					while(br.readLine()!=null){
-						mgr.saveFile(br.readLine().getBytes(), fileName);
+						mgr.saveFile(br.readLine().getBytes(), fileurl);
 						flag = true;
 					}
 					if(flag){
@@ -252,6 +264,49 @@ public class P2PHandler {
 		return null;
 	}
 	
+	public byte[] searchAndGetFile(String fileName){
+		//OutputStream os = getFile(fileName);
+		//File dir = new File(CACHE_PATH_NAME);
+		String path = System.getProperty("user.home")+File.separator+"LANP2P";
+		File dir = new File(path);
+		//ArrayList <Byte> b = new ArrayList<Byte>();
+		
+		DataInputStream dis;
+		System.out.println("Path Info "+path);
+		System.out.println("Directory Info "+dir + " IsDirectory "+dir.isDirectory() +" Directory Exists? "+ dir.exists());
+
+		if(!dir.exists()){
+			dir.mkdir();
+		}
+
+
+		for(File search : dir.listFiles()){
+					
+			if(search.getName().equals(fileName)){
+		    try {
+					dis = new DataInputStream(new FileInputStream(search));
+					byte []b1 = new byte[dis.available()];
+		
+					dis.readFully(b1);
+		
+					System.out.println(" Printing the bytes" + b1.length);
+					return b1;
+										
+				} catch (FileNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch(EOFException eof){
+					eof.printStackTrace();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+				
+			}
+		}
+		return null;
+	}
 	
 
 }
