@@ -1,0 +1,99 @@
+
+#topnav {
+ clear: both;
+ float: right;
+ margin: 0;
+ padding: 0;
+/*  border-top: 1px solid #600; */
+/*  width: 750px; */
+ width: 100%;
+}
+
+
+#topnav ul { 
+ margin: 0;
+ padding: 0;
+ list-style-type: none;
+ float: right;
+}
+
+#topnav li {
+ display: block;
+ float: left;
+ margin: 0;
+ padding: 0;
+} 
+#topnav a { 
+ display: block;
+ padding: 4px 15px;
+ margin: 0;
+ color: #555;
+ text-decoration: none;
+ font-size: 13px;
+ letter-spacing: -1px;
+ border-bottom: none;
+ border-right: 1px solid #ddd;
+}
+
+#topnav li a:hover { 
+ color: #fff;
+ background: #2cF;
+}
+
+
+:link, :visited {
+ text-decoration: none;
+ color: #0a7fba;
+ border-bottom: 1px dotted #bbb;
+}
+:link:hover, :visited:hover {
+ background-color: #eee;
+ color: #558;
+}
+
+
+li.milestone .info h2 em { color: #0a7fba; }
+
+
+body
+{
+  font-family: Verdana,Helvetica, Arial, sans-serif; 
+  font-size: 10pt;
+}
+
+
+h1
+{
+  color: white;
+  background-image: url(/banner/border2.png);
+  background-repeat: no-repeat;
+  border-right: 2px solid #3399CC;
+  border-bottom: 2px solid #3399CC;
+  background-color: #B2ECFD;
+  padding-top: 2px;
+  padding-left: 5px;
+  width: 99%;
+}
+
+h2, h3
+{
+  color: #3366AA;
+  background-image: url(/banner/banner_w.png);
+  background-repeat: no-repeat;
+  background-color: #F0FFFF;
+  border-bottom: 2px solid #AADDFF;
+  border-left: 2px solid #99CCFF;
+  border-top: 1px solid #EEEEFF;
+  border-right: 1px solid #EEEEFF;
+  padding: 2px;
+
+  padding-left: 5px;
+  width: 98%;
+}
+
+h1 :link, h1 :visited, h1 .first:link, h1 .first:visited
+{
+  color: #DDF0FF;
+}
+
+

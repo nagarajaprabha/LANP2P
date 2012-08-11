@@ -1,0 +1,512 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>
+      SQLiteJDBC –
+      Xerial – Trac
+    </title>
+        <link rel="search" href="http://www.xerial.org/trac/Xerial/search">
+        <link rel="help" href="http://www.xerial.org/trac/Xerial/wiki/TracGuide">
+        <link rel="alternate" href="http://www.xerial.org/trac/Xerial/wiki/SQLiteJDBC?format=txt" type="text/x-trac-wiki" title="Plain Text">
+        <link rel="up" href="http://www.xerial.org/trac/Xerial/wiki/SQLiteJDBC" title="View Latest Version">
+        <link rel="start" href="http://www.xerial.org/trac/Xerial/wiki">
+        <link rel="stylesheet" href="SQLiteJDBC_files/trac.css" type="text/css"><link rel="stylesheet" href="SQLiteJDBC_files/wiki.css" type="text/css">
+        <link rel="shortcut icon" href="http://www.xerial.org/xerial.ico" type="image/x-icon">
+        <link rel="icon" href="http://www.xerial.org/xerial.ico" type="image/x-icon">
+      <link type="application/opensearchdescription+xml" rel="search" href="http://www.xerial.org/trac/Xerial/search/opensearch" title="Search Xerial">
+    <script type="text/javascript" src="SQLiteJDBC_files/jquery.js"></script><script type="text/javascript" src="SQLiteJDBC_files/trac.js"></script><script type="text/javascript" src="SQLiteJDBC_files/search.js"></script>
+    <!--[if lt IE 7]>
+    <script type="text/javascript" src="/trac/Xerial/chrome/common/js/ie_pre7_hacks.js"></script>
+    <![endif]-->
+    <script type="text/javascript">
+      jQuery(document).ready(function($) {
+        $("#content").find("h1,h2,h3,h4,h5,h6").addAnchor("Link to this section");
+      });
+    </script>
+    <link rel="stylesheet" type="text/css" href="SQLiteJDBC_files/trac_002.css">
+  </head>
+  <body>
+    <div id="siteheader">
+ <div id="topnav">
+  <ul><li><a href="http://www.xerial.org/trac/Xerial/">Xerial Trac</a></li>
+<li><a href="http://voice.xerial.org/">Blog</a></li>
+<li><a href="http://www.xerial.org/maven/repository/artifact/org/xerial">Download</a></li>
+<li><a href="http://code.google.com/p/xerial/source/list">Source Code</a></li>
+<!--<li><a href="http://www.xerial.org/maven/repository/site/xerial-project">Project Information</a></li>-->
+<li><a href="http://www.xerial.org/trac/Xerial/wiki/Publications">Publications</a></li>
+<li><a href="http://www.xerial.org/trac/Xerial/wiki/leo">About xerial.org</a></li>
+<li><img src="SQLiteJDBC_files/groups_bar.gif" alt="Google Groups" height="26" width="132"></li>
+<li><a href="http://groups.google.com/group/xerial?hl=en">Visit this group</a></li>
+</ul>
+    </div>
+ </div>
+    <div id="banner">
+      <div id="header">
+        <a id="logo" href="http://www.xerial.org/"><img src="SQLiteJDBC_files/xerial_logo_blue.png" alt="Xerial"></a>
+      </div>
+      <form id="search" action="/trac/Xerial/search" method="get">
+        <div>
+          <label for="proj-search">Search:</label>
+          <input id="proj-search" name="q" size="18" type="text">
+          <input value="Search" type="submit">
+        </div>
+      </form>
+      <div id="metanav" class="nav">
+    <ul>
+      <li class="first"><a href="http://www.xerial.org/trac/Xerial/login">Login</a></li><li><a href="http://www.xerial.org/trac/Xerial/prefs">Preferences</a></li><li><a href="http://www.xerial.org/trac/Xerial/wiki/TracGuide">Help/Guide</a></li><li class="last"><a href="http://www.xerial.org/trac/Xerial/about">About Trac</a></li>
+    </ul>
+  </div>
+    </div>
+    <div id="mainnav" class="nav">
+    <ul>
+      <li class="first active"><a href="http://www.xerial.org/trac/Xerial/wiki">Wiki</a></li><li><a href="http://www.xerial.org/trac/Xerial/timeline">Timeline</a></li><li><a href="http://www.xerial.org/trac/Xerial/roadmap">Roadmap</a></li><li><a href="http://www.xerial.org/trac/Xerial/browser">Browse Source</a></li><li><a href="http://www.xerial.org/trac/Xerial/report">View Tickets</a></li><li class="last"><a href="http://www.xerial.org/trac/Xerial/search">Search</a></li>
+    </ul>
+  </div>
+    <div id="main">
+      <div id="ctxtnav" class="nav">
+        <h2>Context Navigation</h2>
+          <ul>
+            <li class="first "><a href="http://www.xerial.org/trac/Xerial/wiki/WikiStart">Start Page</a></li><li><a href="http://www.xerial.org/trac/Xerial/wiki/TitleIndex">Index</a></li><li><a href="http://www.xerial.org/trac/Xerial/wiki/SQLiteJDBC?action=history">History</a></li><li class="last"><a href="http://www.xerial.org/trac/Xerial/wiki/SQLiteJDBC?action=diff&amp;version=244">Last Change</a></li>
+          </ul>
+        <hr>
+      </div>
+    <div id="content" class="wiki">
+      <div class="wikipage searchable">
+        
+          <p>
+</p><div class="wiki-toc"><ol><li><a href="#SQLiteJDBCDriver">SQLite JDBC Driver</a><ol><li><a href="#WhatisdifferentfromZentussSQLiteJDBC">What is different from Zentus's SQLite JDBC?</a></li><li>
+<a href="#PublicDiscussionForum">Public Discussion Forum</a></li><li>
+<a href="#News">News</a></li><li>
+<a href="#Download">Download</a><ol><li><a href="#BetaRelease">Beta Release</a></li></ol></li><li>
+<a href="#SupportedOperatingSystems">Supported Operating Systems</a></li><li>
+<a href="#Usage">Usage</a></li><li>
+<a href="#HowtoSpecifyDatabaseFiles">How to Specify Database Files</a></li><li>
+<a href="#HowtoUseMemoryDatabases">How to Use Memory Databases</a></li><li>
+<a href="#Howtotesttherunningmode:NativeorPure-JavaVersion">How to test the running mode: Native or Pure-Java Version?</a></li><li>
+<a href="#RuninPure-Javamode">Run in Pure-Java mode</a></li><li>
+<a href="#HowtouseOnlineBackupandRestoreFeature">How to use Online Backup and Restore Feature</a></li><li>
+<a href="#CreatingBLOBdata">Creating BLOB data</a></li><li>
+<a href="#HowdoesSQLiteJDBCwork">How does SQLiteJDBC work?</a></li><li>
+<a href="#SourceCodes">Source Codes</a></li><li>
+<a href="#License">License</a></li><li>
+<a href="#UsingSQLiteJDBCwithMaven2">Using SQLiteJDBC with Maven2</a></li><li>
+<a href="#UsingSQLiteJDBCwithTomcat6WebServer">Using SQLiteJDBC with Tomcat6 Web Server</a></li><li>
+<a href="#BuildfromSource">Build from Source</a><ol><li><a href="#DependencyTests">Dependency Tests</a></li></ol></li></ol></li></ol></div><p>
+</p>
+<h1 id="SQLiteJDBCDriver">SQLite JDBC Driver<a title="Link to this section" href="#SQLiteJDBCDriver" class="anchor"> ¶</a></h1>
+<p>
+SQLite JDBC driver developed by <a class="wiki" href="http://www.xerial.org/trac/Xerial/wiki/leo">Taro L. Saito</a> is an extension of <a class="ext-link" href="http://www.zentus.com/sqlitejdbc"><span class="icon">Zentus's SQLite JDBC driver</span></a> that enables Java to access <a class="ext-link" href="http://sqlite.org/"><span class="icon">SQLite</span></a> database files.
+</p>
+<p>
+Our SQLiteJDBC library, developed as a part of <a class="ext-link" href="http://www.xerial.org/"><span class="icon">Xerial project</span></a>,
+ requires no configuration since all native libraries for Windows, Mac 
+OS X, Linux and pure-java SQLite, which works in any OS enviroment, are 
+assembled into a single JAR (Java Archive) file. The usage is quite 
+simple; <a href="http://www.xerial.org/trac/Xerial/wiki/SQLiteJDBC#Download">Download</a> our sqlite-jdbc library, then append the library (JAR file) to your class path. See <a href="http://www.xerial.org/trac/Xerial/wiki/SQLiteJDBC#Usage">the sample code</a>. 
+</p>
+<h2 id="WhatisdifferentfromZentussSQLiteJDBC">What is different from Zentus's SQLite JDBC?<a title="Link to this section" href="#WhatisdifferentfromZentussSQLiteJDBC" class="anchor"> ¶</a></h2>
+<p>
+The original Zentus's SQLite JDBC driver <a class="ext-link" href="http://www.zentus.com/sqlitejdbc/"><span class="icon">http://www.zentus.com/sqlitejdbc/</span></a> itself is an excellent utility for using <a class="ext-link" href="http://sqlite.org/"><span class="icon">SQLite</span></a>
+ databases from Java language, and our SQLiteJDBC library also relies on
+ its implementation. However, its pure-java version, which totally 
+translates c/c++ codes of SQLite into Java, is significantly slower 
+compared to its native version, which uses SQLite binaries compiled for 
+each OS (win, mac, linux). 
+</p>
+<p>
+To use the native version of sqlite-jdbc, user had to set a path to the 
+native codes (dll, jnilib, so files, which are JNDI C programs) by using
+ command-line arguments, e.g., -Djava.library.path=(path to the dll, 
+jnilib, etc.), or -Dorg.sqlite.lib.path, etc. This process was 
+error-prone and bothersome to tell every user to set these variables. 
+Our SQLiteJDBC library completely does away these inconveniences. 
+</p>
+<p>
+Another difference is that we are keeping this SQLiteJDBC libray 
+up-to-date to the newest version of SQLite engine, because we are one of
+ the hottest users of this library. For example, SQLite JDBC is a core 
+component of <a class="ext-link" href="http://utgenome.org/"><span class="icon">UTGB (University of Tokyo Genome Browser) Toolkit</span></a>, which is our utility to create personalized genome browsers.
+</p>
+<h2 id="PublicDiscussionForum">Public Discussion Forum<a title="Link to this section" href="#PublicDiscussionForum" class="anchor"> ¶</a></h2>
+<ul><li>Post bug reports or feature requests to Issue Tracker at <a class="ext-link" href="http://code.google.com/p/sqlite-jdbc/"><span class="icon">http://code.google.com/p/sqlite-jdbc/</span></a> 
+</li><li>Public discussion forum: <a class="ext-link" href="http://groups.google.com/group/xerial?hl=en"><span class="icon">Xerial Public Discussion Group</span></a> 
+</li></ul><h2 id="News">News<a title="Link to this section" href="#News" class="anchor"> ¶</a></h2>
+<ul><li>2011 May 26th:  sqlite-jdbc-3.7.6.3-SNAPSHOT (beta) release: <a href="http://www.xerial.org/maven/repository/snapshot/org/xerial/sqlite-jdbc/3.7.6.3-SNAPSHOT/">http://www.xerial.org/maven/repository/snapshot/org/xerial/sqlite-jdbc/3.7.6.3-SNAPSHOT/</a>
+</li><li>2010 August 27th: sqlite-jdbc-3.7.2 release: <a href="http://www.xerial.org/maven/repository/artifact/org/xerial/sqlite-jdbc/3.7.2/">http://www.xerial.org/maven/repository/artifact/org/xerial/sqlite-jdbc/3.7.2/</a>
+</li><li>2010 April 3rd: beta release of sqlite-jdbc-3.6.23.1-SNAPSHOT: <a href="http://www.xerial.org/maven/repository/snapshot/org/xerial/sqlite-jdbc/">http://www.xerial.org/maven/repository/snapshot/org/xerial/sqlite-jdbc/</a>
+<ul><li>Added online backup/restore functions. Syntax: backup to (file name),  restore from (file name).
+</li></ul></li><li>2009 December 10th: <a href="http://www.xerial.org/maven/repository/artifact/org/xerial/sqlite-jdbc/3.6.20.1/">sqlite-jdbc-3.6.20.1</a> release. 
+<ul><li>Read-only conection, recursive trigger, foreign key validation support etc. using SQLiteConfig class.
+<div class="code"><pre>SQLiteConfig config = <b><span class="code-lang">new</span></b> SQLiteConfig();
+<i><span class="code-comment">// config.setReadOnly(true);   
+</span></i>config.setSharedCache(<b><span class="code-lang">true</span></b>);
+config.recursiveTriggers(<b><span class="code-lang">true</span></b>);
+<i><span class="code-comment">// ... other configuration can be set via SQLiteConfig object
+</span></i>Connection conn = DriverManager.getConnection(<b><span class="code-string">"jdbc:sqlite:sample.db"</span></b>, config.toProperties());</pre></div></li></ul></li><li>2009 November 12th: <a href="http://www.xerial.org/maven/repository/artifact/org/xerial/sqlite-jdbc/3.6.19/">sqlite-jdbc-3.6.19</a> release. 
+<ul><li>added 64-bit OS support: 64-bit native SQLite binaries for Windows (x86_64), Mac (x86_64) and Linux (adm64) are available.
+</li></ul></li><li>2009 August 19th: <a href="http://www.xerial.org/maven/repository/artifact/org/xerial/sqlite-jdbc/3.6.17.1/">sqlite-jdbc-3.6.17.1</a> released. 
+</li><li>2009 July 2nd: <a href="http://www.xerial.org/maven/repository/artifact/org/xerial/sqlite-jdbc/3.6.16/">sqlite-jdbc-3.6.16</a> release. 
+</li><li>2009 June 4th: <a href="http://www.xerial.org/maven/repository/artifact/org/xerial/sqlite-jdbc/3.6.14.2/">sqlite-jdbc-3.6.14.2</a> released. 
+</li><li>2009 May 19th: <a href="http://www.xerial.org/maven/repository/artifact/org/xerial/sqlite-jdbc/3.6.14.1/">sqlite-jdbc-3.6.14.1</a>
+ released. This version supports "jdbc:sqlite::resource:" syntax to 
+access read-only DB files contained in JAR archives, or external 
+resources specified via URL, local files address etc. (see also the <a class="ext-link" href="http://groups.google.com/group/xerial/browse_thread/thread/39acb38f99eb2469/fc6afceabeaa0f76?lnk=gst&amp;q=resource#fc6afceabeaa0f76"><span class="icon">detailes</span></a>) 
+</li></ul><ul><li>2009 February 18th: sqlite-jdbc-3.6.11 released. 
+<ul><li>Fixed a bug in PrepStmt, which does not clear the batch contents after executeBatch(). <a class="ext-link" href="http://groups.google.com/group/xerial/browse_thread/thread/1fa83eb36f6d5dab"><span class="icon">Discussion</span></a>.
+</li></ul></li></ul><ul><li>2009 January 19th: sqlite-jdbc-3.6.10 released. This version is compatible with sqlite version 3.6.10. <a class="ext-link" href="http://www.sqlite.org/releaselog/3_6_10.html"><span class="icon">http://www.sqlite.org/releaselog/3_6_10.html</span></a>
+<ul><li>Added READ_UNCOMMITTED mode support for better query performance: (see also <a class="ext-link" href="http://www.sqlite.org/sharedcache.html"><span class="icon">http://www.sqlite.org/sharedcache.html</span></a> )
+<div class="code"><pre> <i><span class="code-comment">// READ_UNCOMMITTED mode works only in shared_cache mode.
+</span></i> Properties prop = <b><span class="code-lang">new</span></b> Properties();
+ prop.setProperty(<b><span class="code-string">"shared_cache"</span></b>, <b><span class="code-string">"true"</span></b>);
+ Connection conn = DriverManager.getConnection(<b><span class="code-string">"jdbc:sqlite:"</span></b>, prop);
+ conn.setTransactionIsolation(Conn.TRANSACTION_READ_UNCOMMITTED);</pre></div></li></ul></li><li>2008 December 17th: sqlite-jdbc-3.6.7 released. Related information: <a class="ext-link" href="http://www.sqlite.org/releaselog/3_6_7.html"><span class="icon">http://www.sqlite.org/releaselog/3_6_7.html</span></a>
+</li><li>2008 December 1st: sqlite-jdbc-3.6.6.2 released, which fixed a bug incorporated in the version 3.6.6 <a class="ext-link" href="http://www.sqlite.org/releaselog/3_6_6_2.html"><span class="icon">http://www.sqlite.org/releaselog/3_6_6_2.html</span></a> 
+</li><li>2008 November 20th: sqlite-jdbc-3.6.6 release. sqlite-3.6.6 changes: <a class="ext-link" href="http://www.sqlite.org/releaselog/3_6_6.html"><span class="icon">http://www.sqlite.org/releaselog/3_6_6.html</span></a>
+</li></ul><ul><li>2008 November 11th: sqlite-jdbc-3.6.4.1. A bug fix release 
+<ul><li>Pure-java version didn't work correctly. Fixed in both 3.6.4.1 
+and 3.6.4. If you have already downloaded 3.6.4, please obtain the 
+latest one on the download page.
+</li></ul></li><li>2008 October 16th: sqlite-jdbc-3.6.4 released. Changes from SQLite 3.6.3: <a class="ext-link" href="http://www.sqlite.org/releaselog/3_6_4.html"><span class="icon">http://www.sqlite.org/releaselog/3_6_4.html</span></a> 
+<ul><li>R*-Tree index and <del>UPDATE/DELTE syntax with LIMIT clause</del> are available from this build.
+</li></ul></li><li>2008 October 14th: sqlite-jdbc-3.6.3 released. Compatible with SQLite 3.6.3.
+</li><li>2008 September 18th: sqlite-jdbc-3.6.2 released. Compatible with SQLite 3.6.2 and contains pure-java and native versions.
+</li><li>2008 July 17th: sqlite-jdbc-3.6.0 released. Compatible with SQLite 3.6.0, and includes both pure-java and native versions. 
+</li><li>2008 July 3rd: <a href="http://www.xerial.org/maven/repository/artifact/org/xerial/sqlite-jdbc/3.5.9-universal">sqlite-jdbc-3.5.9-universal</a> released. This version contains both native and pure-java SQLite libraries, so it probably works in any OS environment.  
+</li></ul><ul><li>2008 May 29th: Current development revision 
+(sqlite-jdbc-3.5.9-1) can be compiled with JDK 6. No need to use JDK 1.5
+ for compiling SQLiteJDBC. 
+</li><li>2008 May 20th: sqlite-jdbc-3.5.9 released.
+</li><li>2008 May 20th: sqlite-jdbc-3.5.8 released (corresponding to 
+SQLite 3.5.8 and sqlite-jdbc-v047). From this release, Windows, Mac OS 
+X, Linux (i386, amd64) and Solaris (SunOS, sparcv9) libraries are 
+bundled into one jar file.
+</li><li>2008 May 1st: sqlite-jdbc is now in the maven central repository! <a href="http://www.xerial.org/trac/Xerial/wiki/SQLiteJDBC#UsingSQLiteJDBCwithMaven2">How to use SQLiteJDBC with Maven2</a>
+</li><li>2008 Mar. 18th: sqlite-jdbc-3.5.7 released. This version corresponds to <a class="ext-link" href="http://www.sqlite.org/releaselog/3_5_7.html"><span class="icon">SQLite 3.5.7</span></a>.
+</li></ul><ul><li>2008 Mar. 10th: sqlite-jdbc-v042 released. Corresponding to SQLite 3.5.6, which integrates FTS3 (full text search). 
+</li><li>2008 Jan. 31st: sqlite-jdbc-v038.4 released.   SQLiteJDBCLoder.initialize() is no longer requried. 
+</li><li>2008 Jan. 11th: The Jar files for Windows, Mac OS X and Linux 
+are packed into a single Jar file! So, no longer need to use an 
+OS-specific jar file.
+</li><li>2007 Dec. 31th: Upgraded to sqlitejdbc-v038
+</li></ul><h2 id="Download">Download<a title="Link to this section" href="#Download" class="anchor"> ¶</a></h2>
+<p>
+Download the latest version of SQLiteJDBC from <a href="http://www.xerial.org/maven/repository/artifact/org/xerial/sqlite-jdbc">here</a>. 
+</p>
+<ul><li>version 3.6.x is the latest one. 
+<ul><li>Do not use sqlite-jdbc-v0xx.jar, which are obsolete libraries but left here for users still using these versions. 
+</li></ul></li></ul><p>
+If your are an <a class="ext-link" href="http://maven.apache.org/"><span class="icon">Maven</span></a> user, follow the instruction described <a href="http://www.xerial.org/trac/Xerial/wiki/SQLiteJDBC#UsingSQLiteJDBCwithMaven2">here</a>.
+</p>
+<h3 id="BetaRelease">Beta Release<a title="Link to this section" href="#BetaRelease" class="anchor"> ¶</a></h3>
+<p>
+The early releases (beta) of sqlite-jdbc with some advanced features are available from here:
+</p>
+<ul><li><a href="http://www.xerial.org/maven/repository/snapshot/org/xerial/sqlite-jdbc">http://www.xerial.org/maven/repository/snapshot/org/xerial/sqlite-jdbc</a> 
+</li></ul><h2 id="SupportedOperatingSystems">Supported Operating Systems<a title="Link to this section" href="#SupportedOperatingSystems" class="anchor"> ¶</a></h2>
+<p>
+Since sqlite-jdbc-3.6.19, the natively compiled SQLite engines will be used for the following operating systems:
+</p>
+<ul><li>Windows XP, Vista, 7  (x86 architecture, x86_64)
+</li><li>Mac OS X 10.4 (Tiger), 10.5(Leopard), 10.6 <a class="missing wiki" href="http://www.xerial.org/trac/Xerial/wiki/SnowLeopard" rel="nofollow">SnowLeopard?</a> (for i386, x86_64, Intel CPU machines)
+</li><li>Linux i386 (Intel), amd64 (64-bit X86 Intel processor) 
+</li></ul><p>
+In the other OSs not listed above, the pure-java SQLite is used.
+</p>
+<p>
+If you want to use the native library for your OS, <a href="http://www.xerial.org/trac/Xerial/wiki/SQLiteJDBC#BuildfromSource">build the source from scratch</a>.
+</p>
+<h2 id="Usage">Usage<a title="Link to this section" href="#Usage" class="anchor"> ¶</a></h2>
+<ol><li>Download sqlite-jdbc-(VERSION).jar from <a href="http://www.xerial.org/maven/repository/artifact/org/xerial/sqlite-jdbc/">http://www.xerial.org/maven/repository/artifact/org/xerial/sqlite-jdbc/</a>, then append this jar file into your classpath. 
+</li><li>load the JDBC driver org.sqlite.JDBC from your code. (see the example below)
+</li></ol><ul><li>Usage Example (Assuming sqlite-jdbc-(VERSION).jar is placed in the current directory)
+<pre class="wiki">&gt; javac Sample.java
+&gt; java -classpath ".;sqlite-jdbc-(VERSION).jar" Sample   # in Windows
+or 
+&gt; java -classpath ".:sqlite-jdbc-(VERSION).jar" Sample   # in Mac or Linux
+name = leo
+id = 1
+name = yui
+id = 2
+</pre></li><li>Sample.java
+<div class="code"><pre><b><span class="code-lang">import</span></b> java.sql.Connection;
+<b><span class="code-lang">import</span></b> java.sql.DriverManager;
+<b><span class="code-lang">import</span></b> java.sql.ResultSet;
+<b><span class="code-lang">import</span></b> java.sql.SQLException;
+<b><span class="code-lang">import</span></b> java.sql.Statement;
+
+
+<b><span class="code-lang">public</span></b> <b><span class="code-lang">class</span></b> Sample
+{
+  <b><span class="code-lang">public</span></b> <b><span class="code-lang">static</span></b> <b><span class="code-lang">void</span></b> main(String[] args) <b><span class="code-lang">throws</span></b> ClassNotFoundException
+  {
+    <i><span class="code-comment">// load the sqlite-JDBC driver using the current class loader
+</span></i>    Class.forName(<b><span class="code-string">"org.sqlite.JDBC"</span></b>);
+    
+    Connection connection = <b><span class="code-lang">null</span></b>;
+    <b><span class="code-lang">try</span></b>
+    {
+      <i><span class="code-comment">// create a database connection
+</span></i>      connection = DriverManager.getConnection(<b><span class="code-string">"jdbc:sqlite:sample.db"</span></b>);
+      Statement statement = connection.createStatement();
+      statement.setQueryTimeout(30);  <i><span class="code-comment">// set timeout to 30 sec.
+</span></i>      
+      statement.executeUpdate(<b><span class="code-string">"drop table if exists person"</span></b>);
+      statement.executeUpdate(<b><span class="code-string">"create table person (id integer, name string)"</span></b>);
+      statement.executeUpdate(<b><span class="code-string">"insert into person values(1, 'leo')"</span></b>);
+      statement.executeUpdate(<b><span class="code-string">"insert into person values(2, 'yui')"</span></b>);
+      ResultSet rs = statement.executeQuery(<b><span class="code-string">"select * from person"</span></b>);
+      <b><span class="code-lang">while</span></b>(rs.next())
+      {
+        <i><span class="code-comment">// read the result set
+</span></i>        System.out.println(<b><span class="code-string">"name = "</span></b> + rs.getString(<b><span class="code-string">"name"</span></b>));
+        System.out.println(<b><span class="code-string">"id = "</span></b> + rs.getInt(<b><span class="code-string">"id"</span></b>));
+      }
+    }
+    <b><span class="code-lang">catch</span></b>(SQLException e)
+    {
+      <i><span class="code-comment">// if the error message is "out of memory", 
+</span></i>      <i><span class="code-comment">// it probably means no database file is found
+</span></i>      System.err.println(e.getMessage());
+    }
+    <b><span class="code-lang">finally</span></b>
+    {
+      <b><span class="code-lang">try</span></b>
+      {
+        <b><span class="code-lang">if</span></b>(connection != <b><span class="code-lang">null</span></b>)
+          connection.close();
+      }
+      <b><span class="code-lang">catch</span></b>(SQLException e)
+      {
+        <i><span class="code-comment">// connection close failed.
+</span></i>        System.err.println(e);
+      }
+    }
+  }
+}</pre></div></li></ul><p>
+The usage of SQLite-JDBC driver is the same with the original version. See <a class="ext-link" href="http://www.zentus.com/sqlitejdbc/"><span class="icon">http://www.zentus.com/sqlitejdbc/</span></a> for the general usage. For usage of JDBC, see  <a href="http://www.xerial.org/trac/Xerial/wiki/WebApplication/JDBC">my article</a> about JDBC.
+</p>
+<h2 id="HowtoSpecifyDatabaseFiles">How to Specify Database Files<a title="Link to this section" href="#HowtoSpecifyDatabaseFiles" class="anchor"> ¶</a></h2>
+<p>
+Here is an example to select a file C:\work\mydatabase.db (in Windows)
+</p>
+<div class="code"><pre>Connection connection = DriverManager.getConnection(<b><span class="code-string">"jdbc:sqlite:C:/work/mydatabase.db"</span></b>);</pre></div><p>
+A UNIX (Linux, Mac OS X, etc) file /home/leo/work/mydatabase.db
+</p>
+<div class="code"><pre>Connection connection = DriverManager.getConnection(<b><span class="code-string">"jdbc:sqlite:/home/leo/work/mydatabase.db"</span></b>);</pre></div><h2 id="HowtoUseMemoryDatabases">How to Use Memory Databases<a title="Link to this section" href="#HowtoUseMemoryDatabases" class="anchor"> ¶</a></h2>
+<p>
+SQLite supports on-memory database management, which does not create any
+ database files. To use a memory database in your Java code, get the 
+database connection as follows:
+</p>
+<div class="code"><pre>Connection connection = DriverManager.getConnection(<b><span class="code-string">"jdbc:sqlite::memory:"</span></b>);</pre></div><p>
+And also, you can create memory database as follows:
+</p>
+<div class="code"><pre>Connection connection = DriverManager.getConnection(<b><span class="code-string">"jdbc:sqlite:"</span></b>);</pre></div><h2 id="Howtotesttherunningmode:NativeorPure-JavaVersion">How to test the running mode: Native or Pure-Java Version?<a title="Link to this section" href="#Howtotesttherunningmode:NativeorPure-JavaVersion" class="anchor"> ¶</a></h2>
+<div class="code"><pre><b><span class="code-lang">import</span></b> org.sqlite.SQLiteJDBCLoader;
+
+<i><span class="code-comment">// in your function ...
+</span></i><b><span class="code-lang">void</span></b> test()
+{
+  System.out.println(String.format(<b><span class="code-string">"running in %s mode"</span></b>, SQLiteJDBCLoader.isNativeMode() ? <b><span class="code-string">"native"</span></b> : <b><span class="code-string">"pure-java"</span></b>));
+}
+
+</pre></div><h2 id="RuninPure-Javamode">Run in Pure-Java mode<a title="Link to this section" href="#RuninPure-Javamode" class="anchor"> ¶</a></h2>
+<p>
+In some OS (e.g., old Linux kernel), loading native library causes JVM 
+crashes. In this case, set sqlite.purejava=true JVM variable:
+</p>
+<pre class="wiki"> &gt; java -Dsqlite.purejava=true -cp .:sqlite-jdbc-3.6.10.jar Sample
+</pre><p>
+Or, set this System property before loading the JDBC driver:
+</p>
+<pre class="wiki">  System.setProperty("sqlite.purejava", "true");
+  Class.forName("org.sqlite.JDBC");
+</pre><p>
+In this mode, sqlite-jdbc never uses native SQLite libraries.
+</p>
+<h2 id="HowtouseOnlineBackupandRestoreFeature">How to use Online Backup and Restore Feature<a title="Link to this section" href="#HowtouseOnlineBackupandRestoreFeature" class="anchor"> ¶</a></h2>
+<ul><li>Take a backup of the whole database to "backup.db" file:
+<pre class="wiki">// Create a memory database
+Connection conn = DriverManager.getConnection("jdbc:sqlite:");
+// Do some updates
+stmt.executeUpdate("create table sample(id, name)");
+stmt.executeUpdate("insert into sample values(1, \"leo\")");
+stmt.executeUpdate("insert into sample values(2, \"yui\")");
+// Dump the database contents to a file
+stmt.executeUpdate("backup to backup.db");
+</pre></li></ul><ul><li>Restore the database from a backup file:
+<pre class="wiki">// Create a memory database
+Connection conn = DriverManager.getConnection("jdbc:sqlite:");
+// Restore the database from a backup file
+Statement stat = conn.createStatement();
+stat.executeUpdate("restore from backup.db");
+</pre></li></ul><p>
+Another sample code is <a class="ext-link" href="http://code.google.com/p/xerial/source/browse/src/test/java/org/sqlite/BackupTest.java?repo=sqlite"><span class="icon">here</span></a>.
+</p>
+<h2 id="CreatingBLOBdata">Creating BLOB data<a title="Link to this section" href="#CreatingBLOBdata" class="anchor"> ¶</a></h2>
+<ol><li>Create a table with a column of blob type: create table T (id integer, data blob) 
+</li><li>Create a prepared statement with ? symbol:  insert into T values(1, ?) 
+</li><li>Prepare a blob data in byte array (say byte[] data = ...) 
+</li><li>preparedStatement.setBytes(1, data) 
+</li><li>preparedStatement.execute()... 
+</li></ol><h2 id="HowdoesSQLiteJDBCwork">How does SQLiteJDBC work?<a title="Link to this section" href="#HowdoesSQLiteJDBCwork" class="anchor"> ¶</a></h2>
+<p>
+Our SQLite JDBC driver package (i.e., sqlite-jdbc-(VERSION).jar) 
+contains three types of native SQLite libraries (sqlite-jdbc.dll, 
+sqlite-jdbc.jnilib, sqlite-jdbc.so), each of them is compiled for 
+Windows, Mac OS and Linux. An appropriate native library file is 
+automatically extracted into your OS's temporary folder, when your 
+program loads "org.sqlite.JDBC" driver.  
+</p>
+<h2 id="SourceCodes">Source Codes<a title="Link to this section" href="#SourceCodes" class="anchor"> ¶</a></h2>
+<ul><li>Mercurial Repository: <a class="ext-link" href="http://code.google.com/p/sqlite-jdbc/source/checkout"><span class="icon">http://code.google.com/p/sqlite-jdbc/source/checkout</span></a> 
+<pre class="wiki">$ hg clone https://sqlite-jdbc.googlecode.com/hg/ sqlite-jdbc
+</pre></li></ul><ul><li>(obsolete) Subversion Repository: <a href="http://www.xerial.org/svn/project/XerialJ/trunk/sqlite-jdbc/">http://www.xerial.org/svn/project/XerialJ/trunk/sqlite-jdbc/</a>
+<ul><li>source code snapshots for each version: <a href="http://www.xerial.org/svn/project/XerialJ/tags/sqlite-jdbc/">http://www.xerial.org/svn/project/XerialJ/tags/sqlite-jdbc/</a>
+</li><li>version 3.6.11 snapshot: <a href="http://www.xerial.org/svn/project/XerialJ/tags/sqlite-jdbc/sqlite-jdbc-3.6.11">http://www.xerial.org/svn/project/XerialJ/tags/sqlite-jdbc/sqlite-jdbc-3.6.11</a>
+</li><li>web viewer: <a href="http://www.xerial.org/trac/Xerial/browser/XerialJ/trunk/sqlite-jdbc">http://www.xerial.org/trac/Xerial/browser/XerialJ/trunk/sqlite-jdbc</a>
+</li></ul></li></ul><h2 id="License">License<a title="Link to this section" href="#License" class="anchor"> ¶</a></h2>
+<p>
+This program follows the Apache License version 2.0 (<a class="ext-link" href="http://www.apache.org/licenses/"><span class="icon">http://www.apache.org/licenses/</span></a> )
+That means:
+</p>
+<p>
+It allows you to:
+</p>
+<ul><li>freely download and use this software, in whole or in part, for personal, company internal, or commercial purposes;
+</li><li>use this software in packages or distributions that you create.
+</li></ul><p>
+It forbids you to:
+</p>
+<ul><li>redistribute any piece of our originated software without proper attribution;
+</li><li>use any marks owned by us in any way that might state or imply that we xerial.org endorse your distribution;
+</li><li>use any marks owned by us in any way that might state or imply that you created this software in question.
+</li></ul><p>
+It requires you to:
+</p>
+<ul><li>include a copy of the license in any redistribution you may make that includes this software;
+</li><li>provide clear attribution to us, xerial.org for any distributions that include this software
+</li></ul><p>
+It does not require you to:
+</p>
+<ul><li>include the source of this software itself, or of any 
+modifications you may have made to it, in any redistribution you may 
+assemble that includes it;
+</li><li>submit changes that you make to the software back to this software (though such feedback is encouraged).
+</li></ul><p>
+See License FAQ <a class="ext-link" href="http://www.apache.org/foundation/licence-FAQ.html"><span class="icon">http://www.apache.org/foundation/licence-FAQ.html</span></a> for more details.
+</p>
+<h2 id="UsingSQLiteJDBCwithMaven2">Using SQLiteJDBC with Maven2<a title="Link to this section" href="#UsingSQLiteJDBCwithMaven2" class="anchor"> ¶</a></h2>
+<p>
+If you are familier with <a class="ext-link" href="http://maven.apache.org/"><span class="icon">Maven2</span></a>,
+ add the following XML fragments into your pom.xml file. With those 
+settings, your Maven will automatically download our SQLiteJDBC library 
+into your local Maven repository, since our sqlite-jdbc libraries are 
+synchronized with the <a class="ext-link" href="http://repo1.maven.org/maven2/org/xerial/sqlite-jdbc/"><span class="icon">Maven's central repository</span></a>. 
+</p>
+<div class="code"><pre>  &lt;dependencies&gt;
+    &lt;dependency&gt;
+      &lt;groupId&gt;org.xerial&lt;/groupId&gt;
+      &lt;artifactId&gt;sqlite-jdbc&lt;/artifactId&gt;
+      &lt;version&gt;3.6.16&lt;/version&gt;
+    &lt;/dependency&gt;
+  &lt;/dependencies&gt;
+</pre></div><h2 id="UsingSQLiteJDBCwithTomcat6WebServer">Using SQLiteJDBC with Tomcat6 Web Server<a title="Link to this section" href="#UsingSQLiteJDBCwithTomcat6WebServer" class="anchor"> ¶</a></h2>
+<p>
+Do not include sqlite-jdbc-(version).jar in WEB-INF/lib folder of your 
+web application package, since multiple web applications hosted by the 
+same Tomcat server cannot load the sqlite-jdbc native library more than 
+once. That is the specification of JNI (Java Native Interface). You will
+ observe <a class="missing wiki" href="http://www.xerial.org/trac/Xerial/wiki/UnsatisfiedLinkError" rel="nofollow">UnsatisfiedLinkError?</a> exception with the message "no SQLite library found".
+</p>
+<p>
+Work-around of this problem is to put sqlite-jdbc-(version).jar file 
+into (TOMCAT_HOME)/lib direcotry, in which multiple web applications can
+ share the same native library file (.dll, .jnilib, .so) extracted from 
+this sqlite-jdbc jar file. 
+</p>
+<p>
+If you are using Maven for your web application, set the dependency 
+scope as 'provided', and manually put the SQLite JDBC jar file into 
+(TOMCAT_HOME)/lib folder.
+</p>
+<pre class="wiki">    &lt;dependency&gt;
+      &lt;groupId&gt;org.xerial&lt;/groupId&gt;
+      &lt;artifactId&gt;sqlite-jdbc&lt;/artifactId&gt;
+      &lt;version&gt;3.6.16&lt;/version&gt;
+      &lt;scope&gt;provided&lt;/scope&gt;
+    &lt;/dependency&gt;
+</pre><h2 id="BuildfromSource">Build from Source<a title="Link to this section" href="#BuildfromSource" class="anchor"> ¶</a></h2>
+<p>
+If your OS is not supported, consider to build the <a href="http://www.xerial.org/trac/Xerial/wiki/SQLiteJDBC#SourceCodes">source</a> from scratch. 
+</p>
+<ul><li>Install Java SDK (1.5 or higher) <a class="ext-link" href="http://java.sun.com/"><span class="icon">http://java.sun.com</span></a>
+</li><li>Install <a class="ext-link" href="http://mercurial.selenic.com/"><span class="icon">Mercurial</span></a> (hg)
+</li><li>Install Maven3 (3.0.2 or higher) <a class="ext-link" href="http://maven.apache.org/"><span class="icon">http://maven.apache.org</span></a>
+<ul><li>You need to set PATH variable so as to run mvn command. Here is an example setting for maven:
+<pre class="wiki">export MAVEN_HOME=$HOME/local/maven-3.0.2
+export PATH=$MAVEN_HOME/bin:$PATH
+</pre></li></ul></li><li>Clone the Mercurial repository 
+<pre class="wiki"> hg clone https://sqlite-jdbc.googlecode.com/hg/ sqlite-jdbc
+</pre></li><li>(If necessary) set the JAVA_HOME environment variable as 
+your JDK folder (e.g. /usr/java/jdk1.5.0_13), and PATH so that you can 
+run the javac command.
+<pre class="wiki"> &gt; export JAVA_HOME=/usr/java/jdk1.5.0_13/; export PATH=$JAVA_HOME/bin:$PATH
+ &gt; javac -version
+ javac 1.5.0_13
+</pre></li><li>Type make in the sqlite-jdbc folder:
+<pre class="wiki"> &gt; make 
+</pre></li><li>A new SQLite JDBC jar file that additionally supports your OS will be generated as target/sqlite-jdbc-(version).jar
+</li></ul><h3 id="DependencyTests">Dependency Tests<a title="Link to this section" href="#DependencyTests" class="anchor"> ¶</a></h3>
+<ul><li>Windows XP (32-bit)
+<ul><li>dependency check
+<pre class="wiki">&gt; DUMPBIN /DEPENDENTS sqlitejdbc.dll
+
+  KERNEL32.dll
+  msvcrt.dll
+</pre></li></ul></li><li>Mac OS X (10.4.10 Tiger ~ 10.5 Leopard)
+<ul><li>dependency check
+<pre class="wiki">&gt; otool -L libsqlitejdbc.jnilib  
+libsqlitejdbc.jnilib:
+        build/Darwin-i386/libsqlitejdbc.jnilib (compatibility version 0.0.0, current version 0.0.0)
+        /usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 88.3.9)
+</pre></li></ul></li><li>Linux (glibc-2.5.12)
+<ul><li>Dependency check
+<pre class="wiki">&gt; ldd libsqlitejdbc.so    
+        linux-gate.so.1 =&gt;  (0x00b45000)
+        libc.so.6 =&gt; /lib/i686/nosegneg/libc.so.6 (0x002dd000)
+        /lib/ld-linux.so.2 (0x47969000)
+</pre></li></ul></li></ul>
+        
+        
+      </div>
+    </div>
+    <div id="altlinks">
+      <h3>Download in other formats:</h3>
+      <ul>
+        <li class="last first">
+          <a rel="nofollow" href="http://www.xerial.org/trac/Xerial/wiki/SQLiteJDBC?format=txt">Plain Text</a>
+        </li>
+      </ul>
+    </div>
+    </div>
+    <div id="footer" xml:lang="en" lang="en"><hr>
+      <a id="tracpowered" href="http://trac.edgewall.org/"><img src="SQLiteJDBC_files/trac_logo_mini.png" alt="Trac Powered" height="30" width="107"></a>
+      <p class="left">
+        Powered by <a href="http://www.xerial.org/trac/Xerial/about"><strong>Trac 0.11.1</strong></a><br>
+        By <a href="http://www.edgewall.org/">Edgewall Software</a>.
+      </p>
+      <p class="right"><a href="http://www.xerial.org/track/Xerial/wiki/leo"><img src="SQLiteJDBC_files/leo-email.png" alg="Taro L. Saito" border="0"></a></p>
+    </div>
+    <div id="sitefooter">
+<p align="right">
+<a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/2.1/jp/"><img alt="Creative Commons License" style="border-width:0" src="SQLiteJDBC_files/88x31.png"></a><br>This work is licenced under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/2.1/jp/">Creative Commons Licence</a>.</p>
+    </div>
+<script src="SQLiteJDBC_files/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-59666-2";
+urchinTracker();
+</script>
+  
+</body></html>
