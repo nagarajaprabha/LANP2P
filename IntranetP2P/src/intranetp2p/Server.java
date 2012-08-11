@@ -14,49 +14,50 @@ import java.net.*;
 
 /**
  * @author nprabha
- *
+ * 
  */
 public class Server {
-	private ServerSocket serverSocket = null; 
+	private ServerSocket serverSocket = null;
 	Socket client = null;
 	private int port;
-	CacheMgr cacheMgr ;
+	CacheMgr cacheMgr;
+
 	public Server(int port) {
 		this.port = port;
 		cacheMgr = new CacheMgr();
 	}
 
-	public void startServer(){
+	public void startServer() {
 		try {
 			System.out.println("Creating Server Socket");
 			System.out.println(port);
 			serverSocket = new ServerSocket(port);
-			
-			Thread t = new Thread(){
+
+			Thread t = new Thread() {
 				public void run() {
-					while(true){
+					while (true) {
 						try {
 							System.out.println("Accept Client Sockets");
 							client = serverSocket.accept();
-												
-							//handle each client seperately
+
+							// handle each client seperately
 						} catch (IOException e) {
 							// TODO Auto-generated catch block
 							new RuntimeException(e);
 						}
-						
+
 					}
 
 				}
 
 			};
-		t.start();
-				
-	} catch (IOException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-		throw new RuntimeException(e);
-	}
+			t.start();
+
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		}
 
 	}
 
@@ -65,8 +66,8 @@ public class Server {
 		return client;
 	}
 
-	public static void main(String []args){
+	public static void main(String[] args) {
 		new Server(7777).startServer();
 	}
-	
+
 }
