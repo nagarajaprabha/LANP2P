@@ -165,10 +165,8 @@ public class P2PHandler {
 
 					BufferedWriter bw = null;
 					String ipAddress = null;
-					InetAddress ip = null;
 
-					SocketAddress sd = null;
-					PrintWriter w = null;
+
 					int i = 0;
 
 					InputStream is = null;
