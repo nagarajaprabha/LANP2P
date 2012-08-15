@@ -22,7 +22,7 @@ public class CacheMgr {
 	public CacheMgr() {
 		try {
 			Class.forName("org.sqlite.JDBC");
-			con = DriverManager.getConnection("jdbc:sqlite:LANP2P");
+			con = DriverManager.getConnection("jdbc:sqlite:./Database/CacheDB");
 
 		} catch (ClassNotFoundException e) {
 			// TODO Auto-generated catch block
@@ -265,12 +265,13 @@ public class CacheMgr {
 
 	public String isFileURLAvailable(String url) {
 		try {
+			System.out.println( " Printing the URL Request : "+ url);
 			stmt = con.createStatement();
 			String response = new String();
 			int rid = 0;
 			ResultSet rs = stmt
 					.executeQuery("SELECT DISTINCT * FROM CACHE WHERE URL = "
-							+ url);
+							+ "'"+url+"'");
 			while (rs.next()) {
 				response = rs.getString(1) + "\n" + rs.getString(2) + "\n"
 						+ rs.getString(3) + "\n" + rs.getString(4);
