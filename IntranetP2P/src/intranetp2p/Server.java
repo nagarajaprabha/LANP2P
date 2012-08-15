@@ -37,7 +37,7 @@ public class Server {
 				public void run() {
 					while (true) {
 						try {
-							System.out.println("Accept Client Sockets");
+							System.out.println("Accepted Client Socket!!Hi Client");
 							client = serverSocket.accept();
 
 							// handle each client seperately
