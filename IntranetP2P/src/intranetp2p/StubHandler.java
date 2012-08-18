@@ -40,20 +40,21 @@ public class StubHandler {
 			DataInputStream dis = (DataInputStream) s.getInputStream();
 			DataOutputStream dos = (DataOutputStream) s.getOutputStream();
 			byte[] b = null;// variable is 'b' contains fileName
-			String fileName = new String();
+			String url = new String();
 			CacheMgr mgr = new CacheMgr();
 			P2PHandler p2pComm = new P2PHandler();
 			while (true) {
-				fileName = dis.readLine();
-				if (mgr.isFileAvailable(fileName)) {
+				url = dis.readLine();
+				if (mgr.isFileAvailable(url)) {
 					// if the file is available in the local cache then search
 					// and return the file contents
-					dos.write(mgr.getFileByName(fileName));
+					dos.write(mgr.searchAndGetFile(url));
 
 				} else {
 					// if the file is not available then call the
 					// P2PCommunicationMediator
-					p2pComm.notifyAllPeers(b.toString());
+					p2pComm.getFileFromPeers(url);
+					
 				}
 			}
 		} catch (UnknownHostException e) {

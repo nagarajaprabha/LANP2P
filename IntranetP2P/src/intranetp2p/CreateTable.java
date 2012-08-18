@@ -1,11 +1,13 @@
 package intranetp2p;
+
 import java.sql.*;
+import java.util.Calendar;
+
 public class CreateTable {
 
 	Connection con;
 	Statement stmt;
-	
-	
+
 	/**
 	 * @param args
 	 */
@@ -13,42 +15,72 @@ public class CreateTable {
 		// TODO Auto-generated method stub
 		CreateTable ct = new CreateTable();
 		ct.openConnection();
-		ct.createTable();
+		//ct.createTable();
+		ct.insertIntoTable();
 		ct.closeConnection();
 	}
-	
-	public void openConnection(){
-		try{
-		Class.forName("org.sqlite.JDBC");
-		con = DriverManager.getConnection("jdbc:sqlite:./Database/CacheDB");
-		}catch(ClassNotFoundException cnfe){
+
+	public void openConnection() {
+		try {
+			Class.forName("org.sqlite.JDBC");
+			con = DriverManager.getConnection("jdbc:sqlite:./Database/CacheDB");
+		} catch (ClassNotFoundException cnfe) {
 			throw new RuntimeException(cnfe);
-		}catch(SQLException sqle){
+		} catch (SQLException sqle) {
 			throw new RuntimeException(sqle);
 		}
 	}
-	
-	public void createTable(){
+
+	public void createTable() {
 		try {
 			stmt = con.createStatement();
-			stmt.executeUpdate("CREATE TABLE cache (url string ,filename string ,size integer,datecreated date )");
+			stmt
+					.executeUpdate("CREATE TABLE cache (url string ,filename string ,size integer,datecreated date )");
 			System.out.println("Table Created");
+			insertIntoTable();
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new RuntimeException(e);
+		}finally{
+			try {
+				stmt.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				throw new RuntimeException(e);
+			}
 		}
-		
+
 	}
-	
-	public void closeConnection(){
+
+	public void insertIntoTable() {
+		try {
+			stmt = con.createStatement();
+			stmt
+					.executeUpdate("INSERT INTO cache (url , filename ,size ) values ("
+							+ "'http://java.sun.com/docs/books/tutorialNB/download/tutorial-5.0.zip','sample1.txt',20)"
+							);
+
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		} finally {
+			try {
+				stmt.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				throw new RuntimeException(e);
+			}
+		}
+	}
+
+	public void closeConnection() {
 		try {
 			stmt.close();
 			con.close();
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
-		
+
 	}
 
 }

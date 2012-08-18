@@ -1,5 +1,6 @@
 package intranetp2p.Test;
 
+import java.io.IOException;
 import java.net.UnknownHostException;
 
 import intranetp2p.P2PHandler;
@@ -24,11 +25,14 @@ public class TestP2PHandler extends TestCase {
 		fail("Not yet implemented"); // TODO
 	}
 
-	public final void testNotifyAllPeers() throws UnknownHostException {
+	public final void testNotifyAllPeers() throws IOException {
 		/**
 		 * This test assumes that server is running
 		 */
-		p2p.notifyAllPeers("https:docs.google.com/document/d/1oVRF2oz5riiWMRTH_7WtKc3xH9Xkzab2KV39ZgTGaXM/");
+		final String url = "http://java.sun.com/docs/books/tutorialNB/download/tutorial-5.0.zip";
+		//p2p.notifyAllPeers(url);
+		
+		assertNotNull(p2p.getFileFromPeers(url));
 		//fail("Not yet implemented"); // TODO
 	}
 	

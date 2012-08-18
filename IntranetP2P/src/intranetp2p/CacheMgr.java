@@ -14,6 +14,7 @@ import java.sql.*;
  * 
  */
 public class CacheMgr {
+	
 	// C:\Document and Settings\nprabha\My Document\LANP2P
 	private static final String CACHE_PATH_NAME = "LANP2P";
 	Connection con;
@@ -25,10 +26,10 @@ public class CacheMgr {
 			con = DriverManager.getConnection("jdbc:sqlite:./Database/CacheDB");
 
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
+
 			throw new RuntimeException(e);
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
+
 			throw new RuntimeException(e);
 		}
 
@@ -42,24 +43,30 @@ public class CacheMgr {
 	 * @return
 	 */
 	public byte[] searchAndGetFile(String fileName) {
-		// OutputStream os = getFile(fileName);
-		// File dir = new File(CACHE_PATH_NAME);
+
 		String path = System.getProperty("user.home") + File.separator
 				+ CACHE_PATH_NAME;
 		File dir = new File(path);
-		// ArrayList <Byte> b = new ArrayList<Byte>();
 
-		DataInputStream dis;
+
+		DataInputStream dis = null;
+
 		System.out.println("Path Info " + path);
 		System.out.println("Directory Info " + dir + " IsDirectory "
 				+ dir.isDirectory() + " Directory Exists? " + dir.exists());
+
 		createDirectoryIfNecessary(dir);
+
 		for (File search : dir.listFiles()) {
+
 			System.out.println(" Required File is "
-					+ removeExtension(search.getName())
+					+ (search.getName())
 					+ " Required Search FileName is " + fileName);
-			if (removeExtension(search.getName()).equals(fileName)) {
+
+			if ((search.getName()).equals(fileName)) {
+
 				try {
+
 					dis = new DataInputStream(new FileInputStream(search));
 					byte[] b1 = new byte[dis.available()];
 					dis.readFully(b1);
@@ -67,13 +74,20 @@ public class CacheMgr {
 					return b1;
 
 				} catch (FileNotFoundException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+
+					throw new RuntimeException(e);
 				} catch (EOFException eof) {
-					eof.printStackTrace();
+					throw new RuntimeException(eof);
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+
+					throw new RuntimeException(e);
+				} finally {
+					try {
+						dis.close();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 				}
 
 			}
@@ -135,7 +149,7 @@ public class CacheMgr {
 			}
 			// TODO pass url as a parameter
 			String url = null;
-			
+
 			insertFileProperties(url, newFile);
 
 		} catch (FileNotFoundException e) {
@@ -236,12 +250,34 @@ public class CacheMgr {
 		return flag;
 
 	}
-
-	public byte[] getFileByName(String string) {
-		// TODO Auto-generated method stub
+/**
+ * @deprecated
+ * @param url
+ * @param fileName
+ * @return
+ */
+	public byte[] getFileByName(String url, String fileName) {
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		try {
+			pstmt = con
+					.prepareStatement("SELECT fileName FROM CACHE WHERE url = ?");
+			pstmt.setString(1, url);
+			rs = pstmt.executeQuery();
+			if (rs.getFetchSize() > 0) {
+				return searchAndGetFile(fileName);
+			}
+		} catch (SQLException sql) {
+			throw new RuntimeException(sql);
+		}
 		return null;
 	}
 
+	/**
+	 * @deprecated
+	 * @param url
+	 * @param fileObj
+	 */
 	public void insertFileProperties(String url, File fileObj) {
 		try {
 			PreparedStatement pstmt = con
@@ -264,23 +300,80 @@ public class CacheMgr {
 	}
 
 	public String isFileURLAvailable(String url) {
+		ResultSet rs = null;
 		try {
-			System.out.println( " Printing the URL Request : "+ url);
+			// System.out.println( " Printing the URL Request : "+ url);
 			stmt = con.createStatement();
 			String response = new String();
 			int rid = 0;
-			ResultSet rs = stmt
-					.executeQuery("SELECT DISTINCT * FROM CACHE WHERE URL = "
-							+ "'"+url+"'");
+			rs = stmt
+					.executeQuery("SELECT DISTINCT filename,url,size FROM CACHE WHERE URL = "
+							+ "'" + url + "'");
+			if (rs == null) {
+				System.out.println(" OOPS RS is null");
+			}
 			while (rs.next()) {
-				response = rs.getString(1) + "\n" + rs.getString(2) + "\n"
-						+ rs.getString(3) + "\n" + rs.getString(4);
+				/*
+				 * response = rs.getString(1) + "\n" + rs.getString(2) + "\n" +
+				 * rs.getString(3) + "\n" + rs.getString(4);
+				 */
+				response = rs.getString(1);
+
+				// System.out.println(" Printing the Response " + response);
+
 				return response;
 			}
 
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new RuntimeException(e);
+		} finally {
+			try {
+				rs.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				new RuntimeException(e);
+			}
+		}
+
+		return null;
+	}
+
+	public String isFileURLNameAvailable(String url,String fileName) {
+		ResultSet rs = null;
+		try {
+			// System.out.println( " Printing the URL Request : "+ url);
+			stmt = con.createStatement();
+			String response = new String();
+			int rid = 0;
+			rs = stmt
+					.executeQuery("SELECT DISTINCT filename,url,size FROM CACHE WHERE URL = "
+							+ "'" + url + "'"+" AND '" +fileName+"'" );
+			if (rs == null) {
+				System.out.println(" OOPS RS is null");
+			}
+			while (rs.next()) {
+				/*
+				 * response = rs.getString(1) + "\n" + rs.getString(2) + "\n" +
+				 * rs.getString(3) + "\n" + rs.getString(4);
+				 */
+				response = rs.getString(1);
+
+				// System.out.println(" Printing the Response " + response);
+
+				return response;
+			}
+
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			throw new RuntimeException(e);
+		} finally {
+			try {
+				rs.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				new RuntimeException(e);
+			}
 		}
 
 		return null;
