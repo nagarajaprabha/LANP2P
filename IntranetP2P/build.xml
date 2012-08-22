@@ -1,0 +1,24 @@
+<project name="lanp2p" basedir=".">
+	<!-- ================================= 
+          target: all              
+         ================================= -->
+    <target name="all" depends="clean,compile,dist" description="Compile">
+        
+    </target>
+	
+	<target name="clean">
+	</target>
+	
+	<!-- - - - - - - - - - - - - - - - - - 
+          target: compile                      
+         - - - - - - - - - - - - - - - - - -->
+    <target name="compile">
+            
+    </target>
+	
+	<target name="dist">
+	</target>
+
+
+	
+</project>
