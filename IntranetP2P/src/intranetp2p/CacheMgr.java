@@ -7,6 +7,9 @@ import java.io.*;
 import java.util.ArrayList;
 
 import javax.swing.filechooser.FileSystemView;
+
+import com.sun.xml.internal.bind.v2.schemagen.xmlschema.Appinfo;
+
 import java.sql.*;
 
 /**
@@ -16,14 +19,28 @@ import java.sql.*;
 public class CacheMgr {
 
 	// C:\Document and Settings\nprabha\My Document\LANP2P
-	private static final String CACHE_PATH_NAME = "LANP2P";
+	private static final String APPLICATION_DIR_NAME = "LANP2P";
+	private static final String CACHE_DIR_NAME = "cache_files";
+	private static final String CACHE_DB_FILE_NAME = "cache.db";
+	
 	Connection con;
 	Statement stmt;
+	String appDirPath;
+	String cacheDirPath;
+	String cacheDbFilePath;
 
 	public CacheMgr() {
 		try {
+			String homeDir = System.getProperty("user.home") + File.pathSeparatorChar;
+			appDirPath = homeDir + APPLICATION_DIR_NAME;
+			cacheDirPath = appDirPath + File.pathSeparatorChar + CACHE_DIR_NAME;
+			cacheDbFilePath = appDirPath + File.pathSeparatorChar + CACHE_DB_FILE_NAME;
+			
+			createDirectoryIfNecessary(new File(appDirPath));
+			createDirectoryIfNecessary(new File(cacheDirPath));
+			
 			Class.forName("org.sqlite.JDBC");
-			con = DriverManager.getConnection("jdbc:sqlite:./Database/CacheDB");
+			con = DriverManager.getConnection("jdbc:sqlite:"+cacheDbFilePath);
 
 		} catch (ClassNotFoundException e) {
 
@@ -44,17 +61,13 @@ public class CacheMgr {
 	 */
 	public byte[] searchAndGetFile(String fileName) {
 
-		String path = System.getProperty("user.home") + File.separator
-				+ CACHE_PATH_NAME;
-		File dir = new File(path);
+		File dir = new File(cacheDirPath);
 
 		DataInputStream dis = null;
 
-		System.out.println("Path Info " + path);
+		System.out.println("Path Info " + cacheDirPath);
 		System.out.println("Directory Info " + dir + " IsDirectory "
 				+ dir.isDirectory() + " Directory Exists? " + dir.exists());
-
-		createDirectoryIfNecessary(dir);
 
 		for (File search : dir.listFiles()) {
 
@@ -131,20 +144,17 @@ public class CacheMgr {
 	 */
 	public void saveFile(byte[] b, String url) {
 		DataOutputStream dos = null;
-		String path = System.getProperty("user.home") + File.separator
-				+ CACHE_PATH_NAME;
-		File dir = new File(path);
+		File dir = new File(cacheDirPath);
 		String fileName = url.substring(url.lastIndexOf('/'), url.length());
 		File newFile = null;
 		try {
-			createDirectoryIfNecessary(dir);
 			// TODO Check whether file already exists
 			String fname = isFileURLNameAvailable(null, url);
 			if (fname == null) {
 				// isFileAvailable(fileName);
-				newFile = new File(path + File.separator + fileName);
+				newFile = new File(cacheDirPath + File.separator + fileName);
 				dos = new DataOutputStream(new FileOutputStream(newFile));
-				System.out.println(path + File.separator + fileName);
+				System.out.println(cacheDirPath + File.separator + fileName);
 				// TODO MIGHT BE A ERROR
 				System.out.println(b.length);
 				for (int i = 0; i < b.length; i++) {
@@ -189,12 +199,9 @@ public class CacheMgr {
 		InputStream is = null;
 		DataInputStream dis = null;
 		byte[] b = null;
-		String path = System.getProperty("user.home") + File.separator
-				+ CACHE_PATH_NAME;
-		File dir = new File(path);
+		File dir = new File(cacheDirPath);
 
 		try {
-			createDirectoryIfNecessary(dir);
 			dis = new DataInputStream(new FileInputStream(fileName));
 			dis.read(b, off, len);
 
@@ -228,15 +235,12 @@ public class CacheMgr {
 
 	public boolean isFileAvailable(String fileName) {
 
-		String path = System.getProperty("user.home") + File.separator
-				+ CACHE_PATH_NAME;
-		File dir = new File(path);
+		File dir = new File(cacheDirPath);
 
 		DataInputStream dis;
-		System.out.println("Path Info " + path);
+		System.out.println("Path Info " + cacheDirPath);
 		System.out.println("Directory Info " + dir + " IsDirectory "
 				+ dir.isDirectory() + " Directory Exists? " + dir.exists());
-		createDirectoryIfNecessary(dir);
 		boolean flag = false;
 		for (File search : dir.listFiles()) {
 			// System.out.println(" Required File is "+
