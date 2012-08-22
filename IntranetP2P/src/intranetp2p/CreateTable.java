@@ -15,7 +15,7 @@ public class CreateTable {
 		// TODO Auto-generated method stub
 		CreateTable ct = new CreateTable();
 		ct.openConnection();
-		//ct.createTable();
+		ct.createTable();
 		ct.insertIntoTable();
 		ct.closeConnection();
 	}
@@ -23,7 +23,7 @@ public class CreateTable {
 	public void openConnection() {
 		try {
 			Class.forName("org.sqlite.JDBC");
-			con = DriverManager.getConnection("jdbc:sqlite:./Database/CacheDB");
+			con = DriverManager.getConnection("jdbc:sqlite:"+System.getProperty("user.home")+java.io.File.separator+"LANP2P"+java.io.File.separator+"CacheDB");
 		} catch (ClassNotFoundException cnfe) {
 			throw new RuntimeException(cnfe);
 		} catch (SQLException sqle) {
@@ -35,7 +35,7 @@ public class CreateTable {
 		try {
 			stmt = con.createStatement();
 			stmt
-					.executeUpdate("CREATE TABLE cache (url string ,filename string ,size integer,datecreated date )");
+					.executeUpdate("CREATE TABLE cache (id integer primary key asc , url string ,actualfilename string,localfilename string,status string ,size integer,datecreated date )");
 			System.out.println("Table Created");
 			insertIntoTable();
 		} catch (SQLException e) {

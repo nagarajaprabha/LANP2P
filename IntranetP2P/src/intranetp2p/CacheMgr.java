@@ -3,53 +3,27 @@
  */
 package intranetp2p;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.EOFException;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.io.*;
+import java.util.ArrayList;
+
+import javax.swing.filechooser.FileSystemView;
+import java.sql.*;
 
 /**
  * @author nprabha
  * 
  */
 public class CacheMgr {
-	
-	// C:\Document and Settings\nprabha\LANP2P
-	private static final String APPLICATION_DIR_NAME = "LANP2P";
-	private static final String CACHE_DIR_NAME = "cache_files";
-	private static final String CACHE_DB_FILE = "cache.db";
-	
+
+	// C:\Document and Settings\nprabha\My Document\LANP2P
+	private static final String CACHE_PATH_NAME = "LANP2P";
 	Connection con;
 	Statement stmt;
-	
-	String appFolderPath;
-	String cacheFolderPath;
-	String cacheDbFilePath;
-	
 
 	public CacheMgr() {
 		try {
 			Class.forName("org.sqlite.JDBC");
-			appFolderPath = System.getProperty("user.home") + File.pathSeparatorChar + APPLICATION_DIR_NAME;
-			createDirectoryIfNecessary(new File(appFolderPath));
-			
-			cacheFolderPath = appFolderPath + File.pathSeparatorChar + CACHE_DIR_NAME;
-			createDirectoryIfNecessary(new File(cacheFolderPath));
-			
-			cacheDbFilePath = appFolderPath + File.pathSeparatorChar + CACHE_DB_FILE;
-			
-			con = DriverManager.getConnection("jdbc:sqlite:"+cacheDbFilePath);
+			con = DriverManager.getConnection("jdbc:sqlite:./Database/CacheDB");
 
 		} catch (ClassNotFoundException e) {
 
@@ -70,17 +44,21 @@ public class CacheMgr {
 	 */
 	public byte[] searchAndGetFile(String fileName) {
 
-		File dir = new File(cacheFolderPath);
+		String path = System.getProperty("user.home") + File.separator
+				+ CACHE_PATH_NAME;
+		File dir = new File(path);
+
 		DataInputStream dis = null;
 
-		System.out.println("Path Info " + cacheFolderPath);
+		System.out.println("Path Info " + path);
 		System.out.println("Directory Info " + dir + " IsDirectory "
 				+ dir.isDirectory() + " Directory Exists? " + dir.exists());
 
+		createDirectoryIfNecessary(dir);
+
 		for (File search : dir.listFiles()) {
 
-			System.out.println(" Required File is "
-					+ (search.getName())
+			System.out.println(" Required File is " + (search.getName())
 					+ " Required Search FileName is " + fileName);
 
 			if ((search.getName()).equals(fileName)) {
@@ -147,34 +125,45 @@ public class CacheMgr {
 
 	/**
 	 * Called by the ProxyServer by supplying the bytes TODO refactor b to
-	 * String
+	 * String SUGGESTION : HOW WOULD IT BE IF WE STORE THE FILENAME WITH THE URL
 	 * 
 	 * @param bytes
 	 */
-	public void saveFile(byte[] b, String fileName) {
+	public void saveFile(byte[] b, String url) {
 		DataOutputStream dos = null;
-		File dir = new File(cacheFolderPath);
+		String path = System.getProperty("user.home") + File.separator
+				+ CACHE_PATH_NAME;
+		File dir = new File(path);
+		String fileName = url.substring(url.lastIndexOf('/'), url.length());
 		File newFile = null;
 		try {
-			newFile = new File(cacheFolderPath + File.separator + fileName);
-			dos = new DataOutputStream(new FileOutputStream(newFile));
-			System.out.println(cacheFolderPath + File.separator + fileName);
-			// TODO MIGHT BE A ERROR
-			System.out.println(b.length);
-			for (int i = 0; i < b.length; i++) {
-				dos.writeByte((b[i]));
-			}
-			// TODO pass url as a parameter
-			String url = null;
+			createDirectoryIfNecessary(dir);
+			// TODO Check whether file already exists
+			String fname = isFileURLNameAvailable(null, url);
+			if (fname == null) {
+				// isFileAvailable(fileName);
+				newFile = new File(path + File.separator + fileName);
+				dos = new DataOutputStream(new FileOutputStream(newFile));
+				System.out.println(path + File.separator + fileName);
+				// TODO MIGHT BE A ERROR
+				System.out.println(b.length);
+				for (int i = 0; i < b.length; i++) {
+					dos.writeByte((b[i]));
+				}
+				// TODO pass url as a parameter
 
-			insertFileProperties(url, newFile);
+				insertFileProperties(url, newFile);
+
+			} else {
+
+			}
 
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+
+			throw new RuntimeException(e);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+
+			throw new RuntimeException(e);
 		} finally {
 			try {
 				dos.close();
@@ -200,9 +189,12 @@ public class CacheMgr {
 		InputStream is = null;
 		DataInputStream dis = null;
 		byte[] b = null;
-		File dir = new File(cacheFolderPath);
+		String path = System.getProperty("user.home") + File.separator
+				+ CACHE_PATH_NAME;
+		File dir = new File(path);
 
 		try {
+			createDirectoryIfNecessary(dir);
 			dis = new DataInputStream(new FileInputStream(fileName));
 			dis.read(b, off, len);
 
@@ -217,8 +209,8 @@ public class CacheMgr {
 		 * 4. Assemble all the parts
 		 */
 		catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+
+			throw new RuntimeException(e);
 		} finally {
 			try {
 				dis.close();
@@ -235,16 +227,16 @@ public class CacheMgr {
 	}
 
 	public boolean isFileAvailable(String fileName) {
-		// TODO Auto-generated method stub
-		// OutputStream os = getFile(fileName);
-		// File dir = new File(CACHE_PATH_NAME);
-		File dir = new File(cacheFolderPath);
-		// ArrayList <Byte> b = new ArrayList<Byte>();
+
+		String path = System.getProperty("user.home") + File.separator
+				+ CACHE_PATH_NAME;
+		File dir = new File(path);
 
 		DataInputStream dis;
-		System.out.println("Path Info " + cacheFolderPath);
+		System.out.println("Path Info " + path);
 		System.out.println("Directory Info " + dir + " IsDirectory "
 				+ dir.isDirectory() + " Directory Exists? " + dir.exists());
+		createDirectoryIfNecessary(dir);
 		boolean flag = false;
 		for (File search : dir.listFiles()) {
 			// System.out.println(" Required File is "+
@@ -261,12 +253,13 @@ public class CacheMgr {
 		return flag;
 
 	}
-/**
- * @deprecated
- * @param url
- * @param fileName
- * @return
- */
+
+	/**
+	 * @deprecated
+	 * @param url
+	 * @param fileName
+	 * @return
+	 */
 	public byte[] getFileByName(String url, String fileName) {
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
@@ -285,17 +278,18 @@ public class CacheMgr {
 	}
 
 	/**
-	 * @deprecated
+	 * 
 	 * @param url
 	 * @param fileObj
 	 */
 	public void insertFileProperties(String url, File fileObj) {
 		try {
 			PreparedStatement pstmt = con
-					.prepareStatement("INSERT INTO CACHE (url,filename,size,datecreated) VALUES (?,?,?,?)");
+					.prepareStatement("INSERT INTO CACHE (url,actualfilename,status,datecreated) VALUES (?,?,?,?)");
 			pstmt.setString(1, url);
-			pstmt.setString(2, fileObj.getName());
-			pstmt.setInt(3, (int) fileObj.length());
+			pstmt.setString(2, url.substring(url.lastIndexOf('/') + 1, url
+					.length()));
+			pstmt.setString(3, "DOWNLOADING");
 			pstmt.setString(4, java.util.Calendar.getInstance().getTime()
 					.toString());
 			boolean f = pstmt.execute();
@@ -350,16 +344,33 @@ public class CacheMgr {
 		return null;
 	}
 
-	public String isFileURLNameAvailable(String url,String fileName) {
+	public String isFileURLNameAvailable(String url, String fileName) {
 		ResultSet rs = null;
 		try {
 			// System.out.println( " Printing the URL Request : "+ url);
 			stmt = con.createStatement();
 			String response = new String();
 			int rid = 0;
-			rs = stmt
-					.executeQuery("SELECT DISTINCT filename,url,size FROM CACHE WHERE URL = "
-							+ "'" + url + "'"+" AND '" +fileName+"'" );
+			if (url != null) {
+				rs = stmt
+						.executeQuery("SELECT DISTINCT filename,url,size FROM CACHE WHERE URL = "
+								+ "'" + url + "'");
+
+			} else if (fileName != null) {
+				rs = stmt
+						.executeQuery("SELECT DISTINCT filename,url,size FROM CACHE WHERE filename = "
+								+ "'" + fileName + "'");
+
+			} else {
+				rs = stmt
+						.executeQuery("SELECT DISTINCT filename,url,size FROM CACHE WHERE URL = "
+								+ "'"
+								+ url
+								+ "'"
+								+ " AND  filename = '"
+								+ fileName + "'");
+
+			}
 			if (rs == null) {
 				System.out.println(" OOPS RS is null");
 			}

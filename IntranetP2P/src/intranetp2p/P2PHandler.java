@@ -213,7 +213,7 @@ public class P2PHandler {
 	 * TODO : Can we rename this method as getFileFromPeers File Location :
 	 * C:\Documents and Settings\nprabha
 	 */
-	public void notifyAllPeers(String fileurl) throws UnknownHostException {
+	public void requestPeers(String fileurl) throws UnknownHostException {
 		// Thread nt = new Thread(){
 		// public void run(){
 
@@ -450,7 +450,7 @@ public class P2PHandler {
 	}
 
 	public byte[] getFileFromPeers(String url) throws IOException {
-		notifyAllPeers(url);
+		requestPeers(url);
 		return downloadFile(url);
 
 	}
