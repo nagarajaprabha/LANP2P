@@ -1,22 +1,53 @@
-<project name="lanp2p" basedir=".">
+<project name="lanp2p" basedir="." default="all">
+	
+		<property name="srcdir" value="${basedir}/src"/>
+		<property name="libdir" value="${basedir}/lib"/>
+		<property name="builddir" value="${basedir}/build"/> 
+		<property name="classes" value="${builddir}/classes"/>
+		<property name="distdir" value="${builddir}/dist"/>
+	
+	<path id="clspath">
+		<fileset dir="${libdir}" includes="**/*.jar"></fileset>
+	</path>
+	
+	<target name="init">
+    </target>
+
 	<!-- ================================= 
           target: all              
          ================================= -->
-    <target name="all" depends="clean,compile,dist" description="Compile">
+    <target name="all" depends="init,clean,compile,dist" description="Compile">
         
     </target>
 	
-	<target name="clean">
+	<target name="clean" depends="init">
+		<delete dir="${builddir}"></delete>
 	</target>
 	
 	<!-- - - - - - - - - - - - - - - - - - 
           target: compile                      
          - - - - - - - - - - - - - - - - - -->
-    <target name="compile">
-            
+    <target name="compile" depends="init,prepare">
+    	<javac srcdir="${srcdir}" destdir="${classes}" classpathref="clspath"></javac>
     </target>
 	
-	<target name="dist">
+	<target name="dist" depends="init,prepare,compile">
+		<jar destfile="${distdir}/lanp2p.jar">
+			<fileset dir="${classes}" includes="**/*.class" >
+			</fileset>
+		</jar>
+		<copy todir="${distdir}">
+			<fileset dir="${libdir}" includes="**/*.jar" ></fileset>
+		</copy>
+		<zip destfile="${distdir}/lanp2p.zip">
+			<fileset dir="${distdir}" includes="**/*.jar" ></fileset>
+		</zip>
+	</target>
+	
+	<target name="prepare" depends="init">
+		<mkdir dir="${builddir}"/>
+		<mkdir dir="${classes}"/>
+		<mkdir dir="${distdir}"/>
 	</target>
 
 
