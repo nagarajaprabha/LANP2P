@@ -6,10 +6,6 @@ package intranetp2p;
 import java.io.*;
 import java.util.ArrayList;
 
-import javax.swing.filechooser.FileSystemView;
-
-import com.sun.xml.internal.bind.v2.schemagen.xmlschema.Appinfo;
-
 import java.sql.*;
 
 /**
@@ -22,7 +18,7 @@ public class CacheMgr {
 	private static final String APPLICATION_DIR_NAME = "LANP2P";
 	private static final String CACHE_DIR_NAME = "cache_files";
 	private static final String CACHE_DB_FILE_NAME = "cache.db";
-	
+
 	Connection con;
 	Statement stmt;
 	String appDirPath;
@@ -31,16 +27,21 @@ public class CacheMgr {
 
 	public CacheMgr() {
 		try {
-			String homeDir = System.getProperty("user.home") + File.pathSeparatorChar;
+			String homeDir = System.getProperty("user.home")
+					+ File.separator;
 			appDirPath = homeDir + APPLICATION_DIR_NAME;
-			cacheDirPath = appDirPath + File.pathSeparatorChar + CACHE_DIR_NAME;
-			cacheDbFilePath = appDirPath + File.pathSeparatorChar + CACHE_DB_FILE_NAME;
+			cacheDirPath = appDirPath + File.separator + CACHE_DIR_NAME;
+			cacheDbFilePath = appDirPath + File.separator
+					+ CACHE_DB_FILE_NAME;
+
+			System.out.println( " APP DIR PATH "+appDirPath);
+			System.out.println(" Cache DIR PATH " + cacheDbFilePath + "\n" + cacheDirPath);
 			
 			createDirectoryIfNecessary(new File(appDirPath));
 			createDirectoryIfNecessary(new File(cacheDirPath));
-			
+
 			Class.forName("org.sqlite.JDBC");
-			con = DriverManager.getConnection("jdbc:sqlite:"+cacheDbFilePath);
+			con = DriverManager.getConnection("jdbc:sqlite:" + cacheDbFilePath);
 
 		} catch (ClassNotFoundException e) {
 
@@ -136,6 +137,56 @@ public class CacheMgr {
 		}
 	}
 
+	public void saveFile(InputStream is, String url) {
+		DataOutputStream dos = null;
+		File dir = new File(cacheDirPath);
+		String fileName = getFileNameFromURL(url);
+		File newFile = null;
+		try {
+			// Check whether filename already exists
+			String fname = isFileURLAvailable(null, fileName);
+			if (fname == null) {
+				System.out.println(" IN SAVE"+fileName);
+				insertFileProperties(url);
+				newFile = new File(cacheDirPath + File.separator + fileName);
+				dos = new DataOutputStream(new FileOutputStream(newFile));
+				System.out.println(cacheDirPath + File.separator + fileName);
+				int i = 0;
+				while ((i = is.read()) != -1) {
+					dos.write(i);
+				}
+				updateFileProperties(url, fileName);
+			} else {
+				System.out.println(" IN ELSE OF SAVE");
+				insertFileProperties(url);
+				String id = isFileURLAvailable(url, fileName);
+				newFile = new File(cacheDirPath + File.separator + fileName
+						+ "_" + Integer.parseInt(id));
+
+				dos = new DataOutputStream(new FileOutputStream(newFile));
+				System.out.println(cacheDirPath + File.separator + fileName);
+				int i = 0;
+				while ((i = is.read()) != -1) {
+					dos.write(i);
+				}
+				updateFileProperties(url, newFile.getName());
+			}
+			
+		
+		} catch (FileNotFoundException e) {
+			throw new RuntimeException(e);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		} finally {
+			try {
+				if(dos!=null)
+					dos.close();
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+		}
+	}
+
 	/**
 	 * Called by the ProxyServer by supplying the bytes TODO refactor b to
 	 * String SUGGESTION : HOW WOULD IT BE IF WE STORE THE FILENAME WITH THE URL
@@ -145,41 +196,47 @@ public class CacheMgr {
 	public void saveFile(byte[] b, String url) {
 		DataOutputStream dos = null;
 		File dir = new File(cacheDirPath);
-		String fileName = url.substring(url.lastIndexOf('/'), url.length());
+		String fileName = getFileNameFromURL(url);
 		File newFile = null;
 		try {
-			// TODO Check whether file already exists
-			String fname = isFileURLNameAvailable(null, url);
+			// Check whether filename already exists
+			String fname = isFileURLAvailable(null, fileName);
 			if (fname == null) {
-				// isFileAvailable(fileName);
+				insertFileProperties(url);
 				newFile = new File(cacheDirPath + File.separator + fileName);
 				dos = new DataOutputStream(new FileOutputStream(newFile));
 				System.out.println(cacheDirPath + File.separator + fileName);
-				// TODO MIGHT BE A ERROR
+
 				System.out.println(b.length);
 				for (int i = 0; i < b.length; i++) {
 					dos.writeByte((b[i]));
 				}
-				// TODO pass url as a parameter
-
-				insertFileProperties(url, newFile);
 
 			} else {
+				insertFileProperties(url);
+				String id = isFileURLAvailable(url, fileName);
+				newFile = new File(cacheDirPath + File.separator + fileName
+						+ "_" + Integer.parseInt(id));
+
+				dos = new DataOutputStream(new FileOutputStream(newFile));
+				System.out.println(cacheDirPath + File.separator + fileName);
+
+				System.out.println(b.length);
+				for (int i = 0; i < b.length; i++) {
+					dos.writeByte((b[i]));
+				}
 
 			}
 
 		} catch (FileNotFoundException e) {
-
 			throw new RuntimeException(e);
 		} catch (IOException e) {
-
 			throw new RuntimeException(e);
 		} finally {
 			try {
 				dos.close();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				throw new RuntimeException(e);
 			}
 		}
 	}
@@ -286,106 +343,92 @@ public class CacheMgr {
 	 * @param url
 	 * @param fileObj
 	 */
-	public void insertFileProperties(String url, File fileObj) {
+	public void insertFileProperties(String url) {
+		PreparedStatement pstmt = null;
 		try {
-			PreparedStatement pstmt = con
+			pstmt = con
 					.prepareStatement("INSERT INTO CACHE (url,actualfilename,status,datecreated) VALUES (?,?,?,?)");
 			pstmt.setString(1, url);
-			pstmt.setString(2, url.substring(url.lastIndexOf('/') + 1, url
-					.length()));
+			pstmt.setString(2, CacheMgr.getFileNameFromURL(url));
 			pstmt.setString(3, "DOWNLOADING");
 			pstmt.setString(4, java.util.Calendar.getInstance().getTime()
 					.toString());
 			boolean f = pstmt.execute();
-			if (!f) {
-				throw new RuntimeException("Error in operation");
-			}
+
+			
 
 		} catch (SQLException e) {
-
-			throw new RuntimeException(e);
-		}
-
-	}
-
-	public String isFileURLAvailable(String url) {
-		ResultSet rs = null;
-		try {
-			// System.out.println( " Printing the URL Request : "+ url);
-			stmt = con.createStatement();
-			String response = new String();
-			int rid = 0;
-			rs = stmt
-					.executeQuery("SELECT DISTINCT filename,url,size FROM CACHE WHERE URL = "
-							+ "'" + url + "'");
-			if (rs == null) {
-				System.out.println(" OOPS RS is null");
-			}
-			while (rs.next()) {
-				/*
-				 * response = rs.getString(1) + "\n" + rs.getString(2) + "\n" +
-				 * rs.getString(3) + "\n" + rs.getString(4);
-				 */
-				response = rs.getString(1);
-
-				// System.out.println(" Printing the Response " + response);
-
-				return response;
-			}
-
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			throw new RuntimeException(e);
 		} finally {
 			try {
-				rs.close();
+				pstmt.close();
 			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				new RuntimeException(e);
+				throw new RuntimeException(e);
+
 			}
 		}
 
-		return null;
 	}
 
-	public String isFileURLNameAvailable(String url, String fileName) {
+	public void updateFileProperties(String url, String localfileName) {
+		PreparedStatement pstmt = null;
+		try {
+			pstmt = con
+					.prepareStatement("UPDATE CACHE SET localfilename=? , status= 'DOWNLOADED' WHERE url = ?");
+			pstmt.setString(1, localfileName);
+			pstmt.setString(2, url);
+			int cnt = pstmt.executeUpdate();
+
+		} catch (SQLException e) {
+			throw new RuntimeException(e);
+		} finally {
+			try {
+				pstmt.close();
+			} catch (SQLException e) {
+				throw new RuntimeException(e);
+			}
+		}
+	}
+
+	public String isFileURLAvailable(String url, String actualfileName) {
 		ResultSet rs = null;
 		try {
-			// System.out.println( " Printing the URL Request : "+ url);
+			System.out.println(" Printing the URL Request : " + url);
 			stmt = con.createStatement();
 			String response = new String();
 			int rid = 0;
 			if (url != null) {
 				rs = stmt
-						.executeQuery("SELECT DISTINCT filename,url,size FROM CACHE WHERE URL = "
+						.executeQuery("SELECT DISTINCT id,actualfilename,url,size FROM CACHE WHERE status = 'DOWNLOADED' AND URL = "
 								+ "'" + url + "'");
 
-			} else if (fileName != null) {
+			} else if (actualfileName != null) {
 				rs = stmt
-						.executeQuery("SELECT DISTINCT filename,url,size FROM CACHE WHERE filename = "
-								+ "'" + fileName + "'");
+						.executeQuery("SELECT DISTINCT id,actualfilename,url,size FROM CACHE WHERE status = 'DOWNLOADED' AND  actualfilename = "
+								+ "'" + actualfileName + "'");
 
 			} else {
 				rs = stmt
-						.executeQuery("SELECT DISTINCT filename,url,size FROM CACHE WHERE URL = "
+						.executeQuery("SELECT DISTINCT id,actualfilename,url,size FROM CACHE WHERE status = 'DOWNLOADED' AND  URL = "
 								+ "'"
 								+ url
 								+ "'"
-								+ " AND  filename = '"
-								+ fileName + "'");
+								+ " AND  actualfilename = '"
+								+ actualfileName + "'");
 
 			}
 			if (rs == null) {
 				System.out.println(" OOPS RS is null");
+				return null;
 			}
 			while (rs.next()) {
 				/*
 				 * response = rs.getString(1) + "\n" + rs.getString(2) + "\n" +
 				 * rs.getString(3) + "\n" + rs.getString(4);
 				 */
-				response = rs.getString(1);
+				response = rs.getString(2);
 
-				// System.out.println(" Printing the Response " + response);
+				 System.out.println(" Printing the Response " + response);
 
 				return response;
 			}
@@ -395,7 +438,10 @@ public class CacheMgr {
 			throw new RuntimeException(e);
 		} finally {
 			try {
-				rs.close();
+				if (rs != null) {
+					rs.close();
+				}
+
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block
 				new RuntimeException(e);
@@ -403,6 +449,10 @@ public class CacheMgr {
 		}
 
 		return null;
+	}
+	
+	public static String getFileNameFromURL(String url){
+		return url.substring(url.lastIndexOf('/')+1, url.length());
 	}
 
 }

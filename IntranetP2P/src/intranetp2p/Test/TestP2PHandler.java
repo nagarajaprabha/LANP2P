@@ -25,7 +25,7 @@ public class TestP2PHandler extends TestCase {
 		fail("Not yet implemented"); // TODO
 	}
 
-	public final void testNotifyAllPeers() throws IOException {
+	public final void testNotifyAllPeers() throws IOException, InterruptedException {
 		/**
 		 * This test assumes that server is running
 		 */
@@ -33,6 +33,8 @@ public class TestP2PHandler extends TestCase {
 		//p2p.notifyAllPeers(url);
 		
 		assertNotNull(p2p.getFileFromPeers(url));
+		
+		System.out.println(java.io.File.pathSeparator + java.io.File.separator + java.io.File.pathSeparatorChar + java.io.File.separatorChar  );
 		//fail("Not yet implemented"); // TODO
 	}
 	

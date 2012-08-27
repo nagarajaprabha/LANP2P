@@ -26,6 +26,9 @@ public class P2PHandler {
 	Socket clientSocket;
 	Server server = new Server(7777);
 	ArrayList<Socket> clntSocket = new ArrayList();
+	byte[] b;
+
+	public static ArrayList<Socket> availablePeers = new ArrayList();
 
 	public P2PHandler() {
 		mgr = new CacheMgr();
@@ -108,7 +111,7 @@ public class P2PHandler {
 								 * Please wait ");
 								 */
 								response = mgr.isFileURLAvailable(request
-										.get(1).trim());
+										.get(1).trim(), null);
 
 								// System.out.println(" Response is " +
 								// response);
@@ -153,18 +156,7 @@ public class P2PHandler {
 										+ request.get(1) + "\n"
 										+ request.get(1));
 
-								out
-										.write(mgr
-												.searchAndGetFile(request
-														.get(1)
-														.substring(
-																request
-																		.get(1)
-																		.lastIndexOf(
-																				'/') + 1,
-																request
-																		.get(1)
-																		.length())));
+								out.write(mgr.searchAndGetFile(CacheMgr.getFileNameFromURL(request.get(1))));
 								out.write("\n".getBytes());
 								out.write((byte) -1);
 								out.flush();
@@ -254,26 +246,15 @@ public class P2PHandler {
 				System.out.println(" Printing the IP Address "
 						+ ipAddress.trim());
 
-				clntSocket.add(new Socket(ipAddress.trim(), 7777));
+				Socket s = new Socket(ipAddress.trim(), 7777);
+				clntSocket.add(s);
 
-				// System.out.println(("isFileURLAvailable\n" + fileurl));
+				P2PURLAvailableHandler p = new P2PURLAvailableHandler(s,
+						fileurl);
 
-				/**
-				 * Format :
-				 * 
-				 * FirstLine : isFileAvailable SecondLine : FileName
-				 */
-				String sb = new String();
-				sb = "isFileURLAvailable".toString() + "\n".toString()
-						+ fileurl.toString() + "\n";
-
-				os = clntSocket.get(i).getOutputStream();
-
-				os.write(sb.getBytes());
-
-				os.flush();
-
-				i++;
+				p.currentThread = Thread.currentThread();
+				Thread t = new Thread(p);
+				t.start();
 
 			}
 			/**
@@ -281,8 +262,6 @@ public class P2PHandler {
 			 */
 
 			System.out.println(" Going to Sleep :)");
-
-			Thread.sleep(50000);
 
 		} catch (Exception e) {
 
@@ -292,127 +271,199 @@ public class P2PHandler {
 		System.out.println(" Bye ");
 	}
 
-	/**
-	 * @param fileurl
-	 * @throws IOException
-	 */
-	private byte[] downloadFile(String fileurl) throws IOException {
+	public class P2PURLAvailableHandler implements Runnable {
+		Socket sock;
+		OutputStream os;
+		InputStream is;
+		String fileurl;
+		Thread currentThread;
 
-		BufferedWriter bw;
-		InputStream is = null;
-		OutputStream os = null;
-		BufferedReader br;
-		ArrayList<Byte> downloadedBytes = new ArrayList();
+		public P2PURLAvailableHandler(Socket s, String url) {
+			// TODO Auto-generated constructor stub
+			this.sock = s;
+			this.fileurl = url;
+		}
 
-		ArrayList<Socket> availablePeers = getCountOfFileAvailablePeers();
+		public void run() {
+			/**
+			 * Format :
+			 * 
+			 * FirstLine : isFileAvailable SecondLine : FileName
+			 */
+			try {
+				String sb = new String();
+				sendRequestForURL();
+				Thread.sleep(1000);
+				addToPeerListOfAvailable();
+				// currentThread.join();
+				// notify();
 
-		try {
-			// getting the count of AVAILABLE SERVER PEERS
-			if (availablePeers.size() > 1) {
-
-				for (Socket peer : availablePeers) {
-
-					// TODO logic of getting the bytes from each
-					/**
-					 * 1. Get the size of the file 2. Compute the bytes for each
-					 * Peer 3. Request the Bytes Assuming each peer has COMPLETE
-					 * FILE FOR SAMPLE , GET THE FILE SIZE FROM THE FIRST PEER
-					 */
-					is = peer.getInputStream();
-					os = peer.getOutputStream();
-
-					br = new BufferedReader(new InputStreamReader(is));
-					bw = new BufferedWriter(new OutputStreamWriter(os));
-
-					int size = 0, offset = 0, length = 0;
-
-					bw.write("get" + fileurl + "\n" + offset + "\n" + "length"
-							+ "\n");
-
-					bw.flush();
-
-					/**
-					 * construct a packet 1. GET 2. FILENAME
-					 * 
-					 */
-
-				}
-			} else if (availablePeers.size() == 1) {
-
-				try {
-
-					is = availablePeers.get(0).getInputStream();
-					os = availablePeers.get(0).getOutputStream();
-
-					br = new BufferedReader(new InputStreamReader(is));
-					bw = new BufferedWriter(new OutputStreamWriter(os));
-
-					bw.write("getFile" + "\n" + fileurl);
-					bw.write("\n");
-
-					bw.flush();
-					os.flush();
-
-					Byte b = null;
-
-					Thread.sleep(10000);
-
-					System.out.println(" Downloading .......");
-
-					while (true) {
-						try {
-							System.out.println(" In LOGIC");
-							b = new Byte((byte) is.read());
-							downloadedBytes.add(b);
-							System.out.println(b);
-							System.out.println(b.equals(new Byte((byte) -1)));
-							if (b.equals(new Byte((byte) -1)))
-								break;
-
-						} catch (IOException io) {
-							break;
-						}
-					}
-
-					byte[] a = new byte[downloadedBytes.size()];
-					int i = 0 ;
-					while (i < downloadedBytes.size()-1) {
-						System.out.println(" Printing the Numbers"+i);
-						a[i] = downloadedBytes.get(i+1);
-						i++;
-					}
-
-					System.out.println(" Congratulations!! Downloaded");
-					return a;
-
-					/*
-					 * // wait for the response Thread.sleep(5000);
-					 * 
-					 * boolean flag = false; while (true) { while (br.readLine() !=
-					 * null) { mgr.saveFile(br.readLine().getBytes(), fileurl);
-					 * flag = true; } if (flag) { break; }
-					 */} catch (Exception e) {
-					throw new RuntimeException(e);
-				} finally {
-					// availablePeers.get(0).shutdownInput();
-					// availablePeers.get(0).shutdownOutput();
-					// os.close();
-				}
-			} else {
-				// NO SERVER PEER HAS THE FILE
+			} catch (IOException io) {
+				throw new RuntimeException(io);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 
-		} finally {
+		}
+
+		/**
+		 * @throws IOException
+		 * @throws InterruptedException
+		 */
+		private void sendRequestForURL() throws IOException,
+				InterruptedException {
+			String sb;
+			sb = "isFileURLAvailable".toString() + "\n".toString()
+					+ fileurl.toString() + "\n";
+
+			os = sock.getOutputStream();
+			os.write(sb.getBytes());
+			os.flush();
+			Thread.sleep(200);
+		}
+
+		public void addToPeerListOfAvailable() {
+
 			try {
-				is.close();
-				os.close();
+				is = sock.getInputStream();
+				BufferedReader br = new BufferedReader(
+						new InputStreamReader(is));
+				while (!br.ready()) {
+					break;
+				}
+
+				String response = br.readLine();
+
+				System.out.println(" Printing the Response of the Peers :"
+						+ response);
+				if (br.ready() && response.trim().equals("Available")) {
+
+					availablePeers.add(sock);
+					System.out.println(" Available Peers List Size "
+							+ availablePeers.size());
+
+				} else {
+					// TODO Intimate the Stub
+				}
+
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 
 		}
-		return null;
+
+	}
+
+	public class P2PFileDownloadHandler implements Runnable {
+		String fileurl;
+		public P2PFileDownloadHandler(String fileurl){
+			System.out.println(" IN P2PFILEDOWNLOADER CONSTRUCTOR : "+ fileurl);
+			this.fileurl = fileurl;
+		}
+		public void run() {
+
+			try {
+				System.out.println("IN P2PFILEHANDLER!!PRINTING THE FILE URL : "+fileurl);
+				downloadFile(fileurl);
+
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+
+		/**
+		 * @param fileurl
+		 * @throws IOException
+		 */
+		private byte[] downloadFile(final String fileurl) throws IOException {
+
+			// getting the count of AVAILABLE SERVER PEERS
+
+			BufferedWriter bw;
+			InputStream is = null;
+			OutputStream os = null;
+			BufferedReader br;
+
+			try {
+				System.out.println(" Dowloading initiated....");
+				if (availablePeers.size() > 1) {
+
+					for (Socket peer : availablePeers) {
+
+						// TODO logic of getting the bytes from each
+						/**
+						 * 1. Get the size of the file 2. Compute the bytes for
+						 * each Peer 3. Request the Bytes Assuming each peer has
+						 * COMPLETE FILE FOR SAMPLE , GET THE FILE SIZE FROM THE
+						 * FIRST PEER
+						 */
+						is = peer.getInputStream();
+						os = peer.getOutputStream();
+
+						br = new BufferedReader(new InputStreamReader(is));
+						bw = new BufferedWriter(new OutputStreamWriter(os));
+
+						int size = 0, offset = 0, length = 0;
+
+						bw.write("get" + fileurl + "\n" + offset + "\n"
+								+ "length" + "\n");
+
+						bw.flush();
+
+						/**
+						 * construct a packet 1. GET 2. FILENAME
+						 * 
+						 */
+
+					}
+				}
+
+				else if (availablePeers.size() == 1) {
+
+					try {
+
+						is = availablePeers.get(0).getInputStream();
+						os = availablePeers.get(0).getOutputStream();
+
+						br = new BufferedReader(new InputStreamReader(is));
+						bw = new BufferedWriter(new OutputStreamWriter(os));
+
+						bw.write("getFile" + "\n" + fileurl);
+						bw.write("\n");
+
+						bw.flush();
+						os.flush();
+
+						Thread.sleep(1000);
+
+						System.out.println(" Downloading ......." + fileurl);
+
+						CacheMgr c = new CacheMgr();
+						c.saveFile(is, fileurl);
+
+						System.out.println(" Congratulations!! Downloaded");
+
+					} catch (Exception e) {
+						throw new RuntimeException(e);
+					} finally {
+						// availablePeers.get(0).shutdownInput();
+						// availablePeers.get(0).shutdownOutput();
+						// os.close();
+					}
+				} else {
+					// NO SERVER PEER HAS THE FILE
+				}
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+
+			return null;
+
+		}
+
 	}
 
 	/**
@@ -457,35 +508,36 @@ public class P2PHandler {
 		return availablePeers;
 	}
 
-	public byte[] getFileFromPeers(String url) throws IOException {
+	public byte[] getFileFromPeers(final String url) throws IOException,
+			InterruptedException {
+		final Thread currentThread = Thread.currentThread();
+		/*
+		 * final Thread t1 = new Thread() { public void run() { try {
+		 * requestPeers(url); // currentThread.join(); } catch
+		 * (UnknownHostException e) { throw new RuntimeException(e); } catch
+		 * (Exception e) { // TODO Auto-generated catch block
+		 * e.printStackTrace(); } } }; t1.start();
+		 * 
+		 * Thread t2 = new Thread() {
+		 * 
+		 * public void run() { try { t1.join(); P2PFileDownloadHandler pd = new
+		 * P2PFileDownloadHandler(); pd.fileurl = url; Thread tt1 = new
+		 * Thread(pd); System.out.println( " IN NEW BLOCK "); tt1.start(); //
+		 * currentThread.join();
+		 *  } catch (Exception e) { throw new RuntimeException(e); } }
+		 * 
+		 * public byte[] getResult() { return b; } }; t2.start(); t2.join();
+		 */
 		requestPeers(url);
-		return downloadFile(url);
+		Thread.sleep(90000);
+		P2PFileDownloadHandler pd = new P2PFileDownloadHandler(url);
+		pd.fileurl = url;
+		Thread tt1 = new Thread(pd);
+		tt1.start();
+		Thread.sleep(100000);
+		System.out.println(" TATAT");
+		return b;
 
-	}
-
-	/**
-	 * 
-	 * API Sends the response to the Client PRoxy
-	 */
-	public Byte sendResponse() {
-		return null;
-	}
-
-	/**
-	 * CommunicationMediator calls this API to get Responses from other Peers
-	 */
-	public void getResponseFromPeers() {
-
-	}
-
-	/**
-	 * CommunicationMediator sends a BroadCast Message to all the Clients/Peers
-	 * connected
-	 * 
-	 * @return
-	 */
-	public Byte broadcastMessage() {
-		return null;
 	}
 
 	// API to return the peer list file
