@@ -24,19 +24,18 @@ public class CacheMgr {
 	String appDirPath;
 	String cacheDirPath;
 	String cacheDbFilePath;
-
+	static int countsequence;
 	public CacheMgr() {
 		try {
-			String homeDir = System.getProperty("user.home")
-					+ File.separator;
+			String homeDir = System.getProperty("user.home") + File.separator;
 			appDirPath = homeDir + APPLICATION_DIR_NAME;
 			cacheDirPath = appDirPath + File.separator + CACHE_DIR_NAME;
-			cacheDbFilePath = appDirPath + File.separator
-					+ CACHE_DB_FILE_NAME;
+			cacheDbFilePath = appDirPath + File.separator + CACHE_DB_FILE_NAME;
 
-			System.out.println( " APP DIR PATH "+appDirPath);
-			System.out.println(" Cache DIR PATH " + cacheDbFilePath + "\n" + cacheDirPath);
-			
+			System.out.println(" APP DIR PATH " + appDirPath);
+			System.out.println(" Cache DIR PATH " + cacheDbFilePath + "\n"
+					+ cacheDirPath);
+
 			createDirectoryIfNecessary(new File(appDirPath));
 			createDirectoryIfNecessary(new File(cacheDirPath));
 
@@ -146,7 +145,7 @@ public class CacheMgr {
 			// Check whether filename already exists
 			String fname = isFileURLAvailable(null, fileName);
 			if (fname == null) {
-				System.out.println(" IN SAVE"+fileName);
+				System.out.println(" IN SAVE" + fileName);
 				insertFileProperties(url);
 				newFile = new File(cacheDirPath + File.separator + fileName);
 				dos = new DataOutputStream(new FileOutputStream(newFile));
@@ -159,9 +158,10 @@ public class CacheMgr {
 			} else {
 				System.out.println(" IN ELSE OF SAVE");
 				insertFileProperties(url);
+				//id is count of available of filename 
 				String id = isFileURLAvailable(url, fileName);
 				newFile = new File(cacheDirPath + File.separator + fileName
-						+ "_" + Integer.parseInt(id));
+						+ "_" + Integer.parseInt(id)+1);
 
 				dos = new DataOutputStream(new FileOutputStream(newFile));
 				System.out.println(cacheDirPath + File.separator + fileName);
@@ -171,20 +171,49 @@ public class CacheMgr {
 				}
 				updateFileProperties(url, newFile.getName());
 			}
-			
-		
+
 		} catch (FileNotFoundException e) {
 			throw new RuntimeException(e);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		} finally {
 			try {
-				if(dos!=null)
+				if (dos != null)
 					dos.close();
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
 		}
+	}
+
+	public void saveFileByPart(InputStream is, String url) {
+		DataOutputStream dos = null;
+	
+		String fileName = getFileNameFromURL(url);
+		File newFile = null;
+		try {
+			// Check whether filename already exists
+			String fname = isFileURLAvailable(null, fileName);
+			if (fname == null) {
+				System.out.println(" IN SAVE" + fileName);
+				insertFileProperties(url);
+			}else{
+
+			}
+			newFile = new File(cacheDirPath + File.separator + fileName
+					+ "_" + (countsequence));
+
+			countsequence++;
+
+		} finally {
+			try {
+				if (dos != null)
+					dos.close();
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+		}
+		
 	}
 
 	/**
@@ -355,8 +384,6 @@ public class CacheMgr {
 					.toString());
 			boolean f = pstmt.execute();
 
-			
-
 		} catch (SQLException e) {
 			throw new RuntimeException(e);
 		} finally {
@@ -428,7 +455,7 @@ public class CacheMgr {
 				 */
 				response = rs.getString(2);
 
-				 System.out.println(" Printing the Response " + response);
+				System.out.println(" Printing the Response " + response);
 
 				return response;
 			}
@@ -450,9 +477,9 @@ public class CacheMgr {
 
 		return null;
 	}
-	
-	public static String getFileNameFromURL(String url){
-		return url.substring(url.lastIndexOf('/')+1, url.length());
+
+	public static String getFileNameFromURL(String url) {
+		return url.substring(url.lastIndexOf('/') + 1, url.length());
 	}
 
 }
