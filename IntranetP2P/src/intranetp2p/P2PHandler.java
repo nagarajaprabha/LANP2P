@@ -16,6 +16,8 @@ import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.Properties;
 import java.util.StringTokenizer;
 
 public class P2PHandler {
@@ -27,6 +29,7 @@ public class P2PHandler {
 	Server server = new Server(7777);
 	ArrayList<Socket> clntSocket = new ArrayList();
 	byte[] b;
+	int sizeofFile;
 
 	public static ArrayList<Socket> availablePeers = new ArrayList();
 
@@ -132,7 +135,8 @@ public class P2PHandler {
 									// TEMPORARAY : ONE PARAMETER IS MISSING
 									out
 											.write(("Available \n"
-													+ st.nextToken() + "\n")
+													+ st.nextToken() + "\n"
+													+ st.nextToken()+ "\n")
 													.getBytes());
 									out.flush();
 
@@ -295,8 +299,6 @@ public class P2PHandler {
 				sendRequestForURL();
 				Thread.sleep(1000);
 				addToPeerListOfAvailable();
-				// currentThread.join();
-				// notify();
 
 			} catch (IOException io) {
 				throw new RuntimeException(io);
@@ -384,7 +386,7 @@ public class P2PHandler {
 			InputStream is = null;
 			OutputStream os = null;
 			BufferedReader br;
-
+			//Map <Socket,Properties >m=new Map<Socket, Properties>;
 
 			try {
 				System.out.println(" Dowloading initiated....");
@@ -400,7 +402,7 @@ public class P2PHandler {
 						 * COMPLETE FILE FOR SAMPLE , GET THE FILE SIZE FROM THE
 						 * FIRST PEER
 						 */
-						 int size = 0, offset = 0, length = 0 ,i =0;
+						 int  offset = 0, length = 0 ,i =0;
 						
 
 						is = peer.getInputStream();
@@ -415,9 +417,12 @@ public class P2PHandler {
 						if(availablePeers.lastIndexOf(peer)!=-1){
 							length = availablePeers.size();
 						}else{
-							length = length+(size/availablePeers.size());
+							length = length+(sizeofFile/availablePeers.size());
 						}
-
+						Properties p = new Properties();
+						p.setProperty("Size", String.valueOf(sizeofFile));
+						p.setProperty("OffSet",String.valueOf(offset));
+						
 						final int finallength = length , finaloffset = offset;
 						final InputStream finalis = is;
 						Thread partthread = new Thread(){
@@ -429,6 +434,8 @@ public class P2PHandler {
 											+ finallength+ "\n");
 									bw.flush();
 									Thread.sleep(1000);
+									//TODO Again should recheck Number of Available Peers Responded
+									
 									CacheMgr c = new CacheMgr();
 									c.saveFileByPart(finalis, fileurl);
 								} catch (IOException e) {
@@ -522,6 +529,7 @@ public class P2PHandler {
 			}
 
 			String response = br.readLine();
+			sizeofFile = Integer.parseInt(br.readLine());
 
 			System.out.println(" Printing the Response of the Peers :"
 					+ response);

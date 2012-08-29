@@ -454,7 +454,9 @@ public class CacheMgr {
 				 * rs.getString(3) + "\n" + rs.getString(4);
 				 */
 				response = rs.getString(2);
-
+				response = response + "\n";
+				response = rs.getString(3);
+				response = response + "\n";
 				System.out.println(" Printing the Response " + response);
 
 				return response;
