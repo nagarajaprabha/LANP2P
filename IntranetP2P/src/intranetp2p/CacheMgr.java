@@ -448,17 +448,17 @@ public class CacheMgr {
 				System.out.println(" OOPS RS is null");
 				return null;
 			}
-			while (rs.next()) {
+			if (rs.next()) {
 				/*
 				 * response = rs.getString(1) + "\n" + rs.getString(2) + "\n" +
 				 * rs.getString(3) + "\n" + rs.getString(4);
 				 */
 				response = rs.getString(2);
 				response = response + "\n";
-				response = rs.getString(3);
-				response = response + "\n";
+				response = response+rs.getString(3);
+				//response = response + "\n";
 				System.out.println(" Printing the Response " + response);
-
+				
 				return response;
 			}
 
