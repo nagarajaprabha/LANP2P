@@ -3,10 +3,21 @@
  */
 package intranetp2p;
 
-import java.io.*;
-import java.util.ArrayList;
-
-import java.sql.*;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.EOFException;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 /**
  * @author nprabha
@@ -146,24 +157,27 @@ public class CacheMgr {
 			String fname = isFileURLAvailable(null, fileName);
 			if (fname == null) {
 				System.out.println(" IN SAVE" + fileName);
-				insertFileProperties(url);
+				
+				insertFileProperties(url,0);
 				newFile = new File(cacheDirPath + File.separator + fileName);
 				dos = new DataOutputStream(new FileOutputStream(newFile));
 				System.out.println(cacheDirPath + File.separator + fileName);
 				int i = 0;
 				while ((i = is.read()) != -1) {
 					dos.write(i);
+					System.out.println(i);
 				}
 				updateFileProperties(url, fileName);
 			} else {
 				System.out.println(" IN ELSE OF SAVE");
-				insertFileProperties(url);
+				dos = new DataOutputStream(new FileOutputStream(newFile));
+				insertFileProperties(url,dos.size());
 				//id is count of available of filename 
 				String id = isFileURLAvailable(url, fileName);
 				newFile = new File(cacheDirPath + File.separator + fileName
 						+ "_" + Integer.parseInt(id)+1);
 
-				dos = new DataOutputStream(new FileOutputStream(newFile));
+				
 				System.out.println(cacheDirPath + File.separator + fileName);
 				int i = 0;
 				while ((i = is.read()) != -1) {
@@ -186,25 +200,20 @@ public class CacheMgr {
 		}
 	}
 
-	public void saveFileByPart(InputStream is, String url) {
+	public void saveFileByPart(InputStream is, String url ,int id) {
 		DataOutputStream dos = null;
-	
-		String fileName = getFileNameFromURL(url);
-		File newFile = null;
 		try {
-			// Check whether filename already exists
-			String fname = isFileURLAvailable(null, fileName);
-			if (fname == null) {
-				System.out.println(" IN SAVE" + fileName);
-				insertFileProperties(url);
-			}else{
-
+			int i = 0;
+			File newFile = new File(cacheDirPath + File.separator + CacheMgr.getFileNameFromURL(url)
+					+ "_" + id);
+			dos = new DataOutputStream(new FileOutputStream(newFile));
+			while ((i = is.read()) != -1) {
+				dos.write(i);
 			}
-			newFile = new File(cacheDirPath + File.separator + fileName
-					+ "_" + (countsequence));
 
-			countsequence++;
-
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			throw new RuntimeException(e);
 		} finally {
 			try {
 				if (dos != null)
@@ -231,7 +240,7 @@ public class CacheMgr {
 			// Check whether filename already exists
 			String fname = isFileURLAvailable(null, fileName);
 			if (fname == null) {
-				insertFileProperties(url);
+				insertFileProperties(url,b.length);
 				newFile = new File(cacheDirPath + File.separator + fileName);
 				dos = new DataOutputStream(new FileOutputStream(newFile));
 				System.out.println(cacheDirPath + File.separator + fileName);
@@ -242,7 +251,7 @@ public class CacheMgr {
 				}
 
 			} else {
-				insertFileProperties(url);
+				insertFileProperties(url,b.length);
 				String id = isFileURLAvailable(url, fileName);
 				newFile = new File(cacheDirPath + File.separator + fileName
 						+ "_" + Integer.parseInt(id));
@@ -294,7 +303,7 @@ public class CacheMgr {
 			return b;
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
 		/**
 		 * 1. Search for the File 2. Get the total Number of Peers and size of
@@ -311,11 +320,6 @@ public class CacheMgr {
 				throw new RuntimeException(e);
 			}
 		}
-
-		/**
-		 * Assemble the contents here
-		 */
-		return null;
 
 	}
 
@@ -372,16 +376,17 @@ public class CacheMgr {
 	 * @param url
 	 * @param fileObj
 	 */
-	public void insertFileProperties(String url) {
+	public void insertFileProperties(String url,int size) {
 		PreparedStatement pstmt = null;
 		try {
 			pstmt = con
-					.prepareStatement("INSERT INTO CACHE (url,actualfilename,status,datecreated) VALUES (?,?,?,?)");
+					.prepareStatement("INSERT INTO CACHE (url,actualfilename,status,datecreated,size) VALUES (?,?,?,?,?)");
 			pstmt.setString(1, url);
 			pstmt.setString(2, CacheMgr.getFileNameFromURL(url));
 			pstmt.setString(3, "DOWNLOADING");
 			pstmt.setString(4, java.util.Calendar.getInstance().getTime()
 					.toString());
+			pstmt.setInt(5, size);
 			boolean f = pstmt.execute();
 
 		} catch (SQLException e) {
@@ -411,6 +416,7 @@ public class CacheMgr {
 		} finally {
 			try {
 				pstmt.close();
+				System.out.println(" Updating Properties Done ");
 			} catch (SQLException e) {
 				throw new RuntimeException(e);
 			}

@@ -60,26 +60,28 @@ public class P2PHandler {
 
 			public void run() {
 				try {
-					// System.out.println(clientSocket);
 
 					ArrayList<String> request = new ArrayList();
 
 					while (true) {
 
 						/**
-						 * ClientSocket Responsibilities are 1. Listen to the
-						 * ClientRequests and Sends the Responses
+						 * ClientSocket Responsibilities are 
+						 * 	1.  Listen to the
+						 * 	2.  ClientRequests 
+						 *  3.  Sends the Responses
 						 */
+/**
+* ***************************************************************************************************
+*/						
+
 						clientSocket = server.getClientSocket();
 
-						// System.out.println(" Listening your Request ....");
-
+/**
+* ***************************************************************************************************
+*/						
 						if (clientSocket != null) {
 
-							/*
-							 * System.out .println(" ClientSocket requested is
-							 * under process ");
-							 */
 							in = clientSocket.getInputStream();
 							out = clientSocket.getOutputStream();
 							pbr = new BufferedReader(new InputStreamReader(in));
@@ -87,53 +89,41 @@ public class P2PHandler {
 						} else {
 							continue;
 						}
+/**
+* ***************************************************************************************************
+*/						
 
 						/**
 						 * FirstLine : isFileAvailable SecondLine : FileName
 						 */
-						/*
-						 * System.out .println(" Printing the Details of
-						 * Requested Message : " + br.readLine());
-						 * 
-						 * System.out.println(br.readLine().equals(
-						 * "isFileURLAvailable".trim()));
-						 */
-
 						String str = new String();
 						request.clear();
+
+/**
+ * **************************Adding the Parameters to the "request" ArrayList*************************************************************************
+ */						
+						
 						while (pbr.ready() && (str = pbr.readLine()) != null) {
 							request.add(str);
-							System.out.println(str + " Reading ... "
-									+ request.get(0));
-
 						}
+
+						
+/**
+* ***************************************************************************************************
+*/						
+
 						if (request.size() > 0) {
+
 							if (request.get(0).equals(
 									"isFileURLAvailable".trim())) {
 
-								/*
-								 * System.out .println(" Yes Got Message :
-								 * Please wait ");
-								 */
 								response = mgr.isFileURLAvailable(request
 										.get(1).trim(), null);
 
-								// System.out.println(" Response is " +
-								// response);
 
-								// TODO can make it into a single condition
 								if (response != null) {
 									StringTokenizer st = new StringTokenizer(
 											response);
-									/*
-									 * out.write(("Available \n" +
-									 * st.nextToken() + "\n" + st.nextToken() +
-									 * "\n" + st.nextToken() + "\n" + st
-									 * .nextToken()).getBytes());
-									 * 
-									 * 
-									 * 
-									 */
 
 									out.write(("Available \n" + st.nextToken()
 											+ "\n" + st.nextToken() + "\n")
@@ -141,8 +131,6 @@ public class P2PHandler {
 									out.flush();
 
 								} else {
-									// System.out.println(" Writing the Response
-									// ");
 									out.write(("NA" + "\n").getBytes());
 									out.flush();
 
@@ -156,14 +144,11 @@ public class P2PHandler {
 								 * FirstList : getFile Second : url Third :
 								 * FileName
 								 */
-								System.out.println("Size of the file is "
-										+ request.get(1) + "\n"
-										+ request.get(1));
 
 								out.write(mgr.searchAndGetFile(CacheMgr
 										.getFileNameFromURL(request.get(1))));
 								out.write("\n".getBytes());
-							//	out.write((byte) -1);
+								// out.write((byte) -1);
 								out.flush();
 								request.clear();
 
@@ -179,7 +164,7 @@ public class P2PHandler {
 										.parseInt(request.get(3))));
 
 								out.write("\n".getBytes());
-								//out.write((byte) -1);
+								// out.write((byte) -1);
 								out.flush();
 								request.clear();
 
@@ -228,17 +213,33 @@ public class P2PHandler {
 
 			// write a method getAllPeersAddress
 			// Iterate each Peer and Send the Info
+/**
+* ***************************************************************************************************
+*/						
 
+			
 			byte[] infoBytes = searchAndGetFile("PeerList.txt");
 
+/**
+* ***************************************************************************************************
+*/						
+
+			
 			bis = new ByteArrayInputStream(infoBytes);
 			BufferedReader br = new BufferedReader(new InputStreamReader(bis));
 
 			assert (infoBytes != null);
+/**
+* ***************************************************************************************************
+*/						
 
 			/**
 			 * Sending Request PART
 			 */
+/**
+* ***************************************************************************************************
+*/						
+
 			while ((ipAddress = br.readLine()) != null) {
 
 				System.out.println(" Printing the IP Address "
@@ -246,6 +247,7 @@ public class P2PHandler {
 
 				Socket s = new Socket(ipAddress.trim(), 7777);
 				clntSocket.add(s);
+
 
 				P2PURLAvailableHandler p = new P2PURLAvailableHandler(s,
 						fileurl);
@@ -255,6 +257,11 @@ public class P2PHandler {
 				t.start();
 
 			}
+			
+/**
+* ***************************************************************************************************
+*/						
+			
 			/**
 			 * Receving RESPONSE PART
 			 */
@@ -293,7 +300,7 @@ public class P2PHandler {
 				sendRequestForURL();
 
 				Thread.sleep(1000);
-				
+
 				addToPeerListOfAvailable();
 
 			} catch (IOException io) {
@@ -311,8 +318,7 @@ public class P2PHandler {
 		 */
 		private void sendRequestForURL() throws IOException,
 				InterruptedException {
-			String sb;
-			sb = "isFileURLAvailable".toString() + "\n".toString()
+			String sb = "isFileURLAvailable".toString() + "\n".toString()
 					+ fileurl.toString() + "\n";
 
 			os = sock.getOutputStream();
@@ -332,8 +338,8 @@ public class P2PHandler {
 				}
 
 				String response = br.readLine();
-				//sizeofFile = Integer.parseInt(br.readLine());
-				
+				// sizeofFile = Integer.parseInt(br.readLine());
+
 				System.out.println(" Printing the Response of the Peers :"
 						+ response);
 				if (br.ready() && response.trim().equals("Available")) {
@@ -348,15 +354,15 @@ public class P2PHandler {
 
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				throw new RuntimeException(e);
 			}
 
 		}
 
 	}
-
+//todo set the fileName as that of thread name
 	public class P2PFileDownloadHandler implements Runnable {
-		String fileurl;
+		String fileurl , fileName;
 		InputStream is = null;
 		OutputStream os = null;
 		BufferedReader br;
@@ -384,8 +390,7 @@ public class P2PHandler {
 						.println("IN P2PFILEHANDLER!!PRINTING THE FILE URL : "
 								+ fileurl);
 
-				bw
-						.write("get" + fileurl + "\n" + offset + "\n" + length
+				bw.write("get" + fileurl + "\n" + offset + "\n" + length
 								+ "\n");
 				bw.flush();
 				Thread.sleep(1000);
@@ -393,7 +398,7 @@ public class P2PHandler {
 				// Peers Responded
 
 				CacheMgr c = new CacheMgr();
-				c.saveFileByPart(is, fileurl);
+				c.saveFileByPart(is, fileurl , Integer.parseInt(Thread.currentThread().getName()));
 
 			} catch (InterruptedException e) {
 				new RuntimeException(e);
@@ -416,7 +421,8 @@ public class P2PHandler {
 		InputStream is = null;
 		OutputStream os = null;
 
-		int offset = 0, length = 0;
+		int offset = 0, length = 0 ,incr = 0;
+		
 
 		try {
 			System.out.println(" Dowloading initiated....");
@@ -446,7 +452,9 @@ public class P2PHandler {
 					downloader.setParameters(fileurl, offset, length);
 					downloader.setStreams(is, os);
 					Thread t = new Thread(downloader);
+					t.setName(Integer.toString(incr++));
 					t.start();
+					
 				}
 
 			}
@@ -461,7 +469,6 @@ public class P2PHandler {
 
 					is = availablePeers.get(0).getInputStream();
 					os = availablePeers.get(0).getOutputStream();
-
 
 					BufferedWriter bw = new BufferedWriter(
 							new OutputStreamWriter(os));
@@ -547,8 +554,8 @@ public class P2PHandler {
 		final Thread currentThread = Thread.currentThread();
 
 		requestPeers(url);
-		
-		Thread.sleep(90000);
+
+		Thread.sleep(5000);
 
 		downloadFile(url);
 
